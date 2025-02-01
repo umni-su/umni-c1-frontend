@@ -1,0 +1,5 @@
+@import "variables.scss";
+
+.full-card-window-height {
+    height: calc(100% - 44px);
+}
