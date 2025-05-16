@@ -9,6 +9,12 @@ import ClimatePanel from "@/components/router/panels/ClimatePanel.vue";
 import HomePanel from "@/components/router/panels/HomePanel.vue";
 import InputsOutputsPanel from "@/components/router/panels/InputsOutputsPanel.vue";
 import OneWirePanel from "@/components/router/panels/OneWirePanel.vue";
+import SettingsApi from "@/components/router/settings/SettingsApi.vue";
+import UpdatesPage from "@/components/router/UpdatesPage.vue";
+import SettingsClimate from "@/components/router/settings/SettingsClimate.vue";
+import RfPanel from "@/components/router/panels/RfPanel.vue";
+import SettingsRf from "@/components/router/settings/SettingsRf.vue";
+import AnalogSensorsPanel from "@/components/router/panels/AnalogSensorsPanel.vue";
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -18,9 +24,13 @@ const router = createRouter({
       component: IndexLayout,
       children: [
         {
-          path: '',
+          path: 'home',
           name: 'home_panel',
           component: HomePanel
+        }, {
+          path: 'analog',
+          name: 'analog',
+          component: AnalogSensorsPanel
         },
         {
           path: 'climate',
@@ -37,7 +47,17 @@ const router = createRouter({
           name: 'one_wire_panel',
           component: OneWirePanel
         },
+        {
+          path: 'rf',
+          name: 'rf_panel',
+          component: RfPanel
+        },
       ]
+    },
+    {
+      path: '/updates',
+      component: UpdatesPage,
+      name: 'updates'
     },
     {
       path: '/settings',
@@ -54,14 +74,29 @@ const router = createRouter({
           component: SettingsNetwork
         },
         {
+          path: 'climate',
+          name: 'settings_ot',
+          component: SettingsClimate
+        },
+        {
           path: 'dio',
           name: 'settings_dio',
           component: SettingsDio
         },
         {
+          path: 'rf',
+          name: 'settings_rf',
+          component: SettingsRf
+        },
+        {
           path: '1wire',
           name: 'settings_1wire',
           component: SettingsOneWire
+        },
+        {
+          path: 'api',
+          name: 'settings_api',
+          component: SettingsApi
         }
       ]
     },

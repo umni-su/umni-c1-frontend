@@ -17,15 +17,8 @@ export default {
   },
   methods: {
     mac(str) {
-      const _ex = str.split('')
-      let mac = ''
-      for (let i = 0; i < _ex.length; i++) {
-        mac += _ex[i]
-        if (i % 2 && i < _ex.length - 1) {
-          mac += ':'
-        }
-      }
-      return mac.toUpperCase()
+
+      return str.toUpperCase()
     }
   }
 }

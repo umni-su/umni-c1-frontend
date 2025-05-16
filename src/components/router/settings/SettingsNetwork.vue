@@ -1,8 +1,10 @@
 <script>
 import {createSuccessNotification} from "@/helpers/notificationHelper.js";
+import RestartConfirmModal from "@/components/chunks/RestartConfirmModal.vue";
 
 export default {
   name: "SettingsWifi",
+  components: {RestartConfirmModal},
   data() {
     return {
       type: 'network',
@@ -55,6 +57,7 @@ export default {
       })
       if (res) {
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Settings saved')));
+        this.$refs.restart.open()
       }
     }
   },
@@ -64,6 +67,7 @@ export default {
 
 <template>
   <VWindowItem value="network">
+    <RestartConfirmModal ref="restart" />
     <VCard
       :disabled="loading"
       :loading="loading"
@@ -72,6 +76,7 @@ export default {
       <VCardText>
         <VSelect
           v-model="values.et"
+          class="mb-4"
           :label="$t('Settings type')"
           :items="netSettingTypes"
           item-value="id"
@@ -80,18 +85,22 @@ export default {
         <div v-if="values.et === 2">
           <VTextField
             v-model="values.eip"
+            class="mb-4"
             :label="$t('IP address')"
           />
           <VTextField
             v-model="values.enm"
+            class="mb-4"
             :label="$t('Network mask')"
           />
           <VTextField
             v-model="values.egw"
+            class="mb-4"
             :label="$t('Gateway')"
           />
           <VTextField
             v-model="values.edns"
+            class="mb-4"
             :label="$t('DNS server')"
           />
         </div>
@@ -100,6 +109,7 @@ export default {
       <VCardText>
         <VSelect
           v-model="values.wt"
+          class="mb-4"
           :label="$t('Settings type')"
           :items="netSettingTypes"
           item-value="id"
@@ -108,18 +118,22 @@ export default {
         <div v-if="values.wt === 2">
           <VTextField
             v-model="values.wip"
+            class="mb-4"
             :label="$t('IP address')"
           />
           <VTextField
             v-model="values.wnm"
+            class="mb-4"
             :label="$t('Network mask')"
           />
           <VTextField
             v-model="values.wgw"
+            class="mb-4"
             :label="$t('Gateway')"
           />
           <VTextField
             v-model="values.wdns"
+            class="mb-4"
             :label="$t('DNS server')"
           />
         </div>
@@ -130,10 +144,12 @@ export default {
       <VCardText>
         <VTextField
           v-model="values.stname"
+          class="mb-4"
           :label="$t('SSID name')"
         />
         <VTextField
           v-model="values.stpwd"
+          class="mb-4"
           type="password"
           :label="$t('SSID password')"
         />

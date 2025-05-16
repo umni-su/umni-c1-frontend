@@ -1,8 +1,11 @@
 <script>
 import {createSuccessNotification} from "@/helpers/notificationHelper.js";
+import ConfirmationDialog from "@/components/chunks/ConfirmationDialog.vue";
+import RestartConfirmModal from "@/components/chunks/RestartConfirmModal.vue";
 
 export default {
   name: "SettingsSystem",
+  components: {RestartConfirmModal, ConfirmationDialog},
   data() {
     return {
       type: 'system',
@@ -32,7 +35,7 @@ export default {
         return this.values
       } else {
         const data = {...{}, ...this.values}
-        delete data.adm
+        delete data.admusr
         delete data.pwd
         return data
       }
@@ -54,6 +57,33 @@ export default {
       })
       if (res) {
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Settings saved')));
+        this.$refs.restart.open()
+      }
+    },
+    async reboot() {
+      const ok = await this.$refs.confirm.show({
+        title: this.$t('Restart device'),
+        message: this.$t('Are you sure you want to restart device?'),
+        okIcon: 'mdi-restart',
+        okText: this.$t('Reboot'),
+        okColor: 'primary'
+      })
+      if (ok) {
+        this.$store.dispatch('reboot')
+        location.reload()
+      }
+    },
+    async factoryReset() {
+      const ok = await this.$refs.confirm.show({
+        title: this.$t('Factory reset'),
+        message: this.$t('Device will be reset all configuration'),
+        okIcon: 'mdi-trash-can',
+        okText: this.$t('Reset'),
+        okColor: 'error'
+      })
+      if (ok) {
+        this.$store.dispatch('factoryReset')
+        location.reload()
       }
     }
   },
@@ -64,6 +94,7 @@ export default {
   <VWindowItem
     value="system"
   >
+    <RestartConfirmModal ref="restart" />
     <VContainer fluid>
       <VRow>
         <VCol
@@ -79,17 +110,20 @@ export default {
               <VForm>
                 <VTextField
                   v-model="values.name"
+                  class="mb-4"
                   :label="$t('Hostname')"
                 />
                 <VSelect
                   v-model="values.upd"
                   item-value="id"
                   item-title="label"
+                  class="mb-4"
                   :items="updateSources"
                   :label="$t('Updates source')"
                 />
                 <VTextField
                   v-model="values.tz"
+                  class="mb-4"
                   :label="$t('Timezone')"
                 />
                 <VTextField
@@ -106,12 +140,14 @@ export default {
                   class="mt-4"
                 >
                   <VTextField
-                    v-model="values.adm"
+                    v-model="values.admusr"
+                    class="mb-4"
                     clearable
                     :label="$t('Username')"
                   />
                   <VTextField
                     v-model="values.pwd"
+                    class="mb-4"
                     clearable
                     :label="$t('Password')"
                   />
@@ -150,6 +186,7 @@ export default {
                 color="primary"
                 prepend-icon="mdi-restart"
                 :text="$t('Reboot')"
+                @click="reboot"
               />
               <VBtn
                 class="w-100 mt-4"
@@ -157,12 +194,14 @@ export default {
                 color="error"
                 prepend-icon="mdi-trash-can"
                 :text="$t('Factory reset')"
+                @click="factoryReset"
               />
             </VCardText>
           </VCard>
         </VCol>
       </VRow>
     </VContainer>
+    <ConfirmationDialog ref="confirm" />
   </VWindowItem>
 </template>
 

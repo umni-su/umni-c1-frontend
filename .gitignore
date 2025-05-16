@@ -11,8 +11,12 @@ node_modules
 .DS_Store
 dist
 dist-ssr
+build
 coverage
 *.local
+
+server/node_modules
+server/vendor
 
 /cypress/videos/
 /cypress/screenshots/

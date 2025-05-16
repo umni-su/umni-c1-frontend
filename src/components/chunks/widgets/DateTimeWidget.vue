@@ -10,7 +10,7 @@ export default {
       return this.sysinfo !== null ? new Date(this.sysinfo?.date) : new Date()
     },
     hostname() {
-      return this.sysinfo.hostname
+      return this.$store.getters['getHostname']
     },
     day() {
       return this.date.getDate().toString().padStart(2, '0')

@@ -1,6 +1,18 @@
 export default {
+  setVersion(state, version) {
+    state.version = version
+  },
   setLoading(state, loading) {
     state.loading = loading
+  },
+  setDebug(state, debug) {
+    state.debug = debug
+  },
+  setHostname(state, hostname) {
+    state.hostname = hostname
+  },
+  setMacname(state, macname) {
+    state.macname = macname
   },
   setAuthenticated(state, authenticated) {
     state.authenticated = authenticated
@@ -12,8 +24,17 @@ export default {
     localStorage.setItem('theme', theme)
     state.theme = theme
   },
+  setRefreshInterval(state, int) {
+    return state.refreshInterval = int
+  },
   setSystemInfoState(state, info) {
     state.state.info = info
+  },
+  setAnalogState(state, ai) {
+    state.state.ai = ai
+  },
+  setRfState(state, rf) {
+    state.state.rf = rf
   },
   setDioState(state, info) {
     state.state.dio = info

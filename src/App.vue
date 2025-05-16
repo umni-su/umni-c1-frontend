@@ -23,8 +23,8 @@ export default {
       return this.$store.getters['getTheme']
     }
   },
-  created() {
-    this.checkAuth()
+  async created() {
+    await this.checkAuth()
   },
   methods: {
     async checkAuth() {
@@ -54,10 +54,6 @@ header {
   max-height: 100vh;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
 
 nav {
   width: 100%;

@@ -18,7 +18,13 @@ export default {
     },
     loading() {
       return this.$store.getters['isLoading']
-    }
+    },
+    theme() {
+      return this.$store.getters['getTheme']
+    },
+    macname() {
+      return this.$store.getters['getMacname']
+    },
   },
   methods: {
     async install() {
@@ -42,41 +48,54 @@ export default {
         cols="12"
         class="left d-flex align-center justify-center"
       >
-        <VSheet
+        <VCard
           v-if="!visible"
-          color="transparent"
-          width="200"
+          class="pa-4 d-flex align-center justify-center flex-column"
+          width="340"
         >
-          <UmniLogo
-            class="d-block mx-auto"
-            :width="180"
-            :height="180"
-          />
-          <div class="mt-6">
-            <VBtn
-              prepend-icon="mdi-play"
-              color="primary-darken"
-              width="100%"
-              :text="$t('Start')"
-              @click="visible = true"
+          <template #text>
+            <UmniLogo
+              :width="250"
+              :height="70"
+              :short="false"
+              class="mb-1 mx-auto"
+              color="#008dd2"
             />
-          </div>
-        </VSheet>
+            <div class="text-subtitle-2 mb-4 opacity-50 text-center">
+              {{ macname?.toUpperCase() }}
+            </div>
+            <div class="mt-6">
+              <VBtn
+                prepend-icon="mdi-play"
+                color="primary-darken"
+                width="100%"
+                :text="$t('Start')"
+                @click="visible = true"
+              />
+            </div>
+          </template>
+        </VCard>
         <VFadeTransition v-else>
           <VCard
-            color="primary-darken"
-            class="d-flex align-center justify-center"
+            class="pa-4 d-flex align-center justify-center flex-column"
             width="340"
-            height="100%"
           >
             <VCardText>
               <VContainer>
                 <VRow class="install-block">
                   <VCol
                     cols="12"
-                    class="left d-flex align-center justify-center"
                   >
-                    <UmniLogo />
+                    <UmniLogo
+                      :width="250"
+                      :height="70"
+                      :short="false"
+                      class="mb-1 mx-auto"
+                      color="#008dd2"
+                    />
+                    <div class="text-subtitle-2 mb-4 opacity-50 text-center">
+                      {{ macname?.toUpperCase() }}
+                    </div>
                   </VCol>
                   <VCol
                     class="right"
@@ -85,17 +104,20 @@ export default {
                     <VForm>
                       <VTextField
                         v-model="username"
+                        class="mb-4"
                         prepend-inner-icon="mdi-account"
                         :label="$t('Enter username')"
                       />
                       <VTextField
                         v-model="password"
+                        class="mb-4"
                         prepend-inner-icon="mdi-key"
                         type="password"
                         :label="$t('Enter password')"
                       />
                       <VTextField
                         v-model="passwordRepeat"
+                        class="mb-4"
                         prepend-inner-icon="mdi-key"
                         type="password"
                         :label="$t('Retype password')"

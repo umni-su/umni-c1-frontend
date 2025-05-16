@@ -1,6 +1,7 @@
 <script>
 import {resetErrorCodeToString} from '@/helpers/resetReason.js'
 import {chipInfoToString} from '@/helpers/chipInfo.js'
+import dateToStringDateTime from "@/helpers/dateToStringDateTime.js";
 
 export default {
   name: 'SystemInfoWidget',
@@ -10,7 +11,7 @@ export default {
     },
     lastReset() {
       const date = new Date(this.sysinfo?.last_reset)
-      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${date.toTimeString().substring(0, 5)}`
+      return dateToStringDateTime(date)
     },
     resetReason() {
       return resetErrorCodeToString(this.sysinfo?.reset_reason)
@@ -22,7 +23,7 @@ export default {
       return this.sysinfo?.total_heap
     },
     usage() {
-      return (this.freeHeap * 100 / this.totalHeap).toFixed(2)
+      return ((this.totalHeap - this.freeHeap) * 100 / this.totalHeap).toFixed(2)
     },
     className() {
       if (this.usage <= 60) {
@@ -35,6 +36,9 @@ export default {
     },
     uptime() {
       return this.toDHS(this.sysinfo.uptime)
+    },
+    version() {
+      return this.$store.getters['getVersion']
     }
   },
   methods: {
@@ -58,8 +62,7 @@ export default {
       }
       return {days: d, hours: pad(h), minutes: pad(m)}
     }
-
-  },
+  }
 }
 </script>
 
@@ -78,6 +81,14 @@ export default {
     </template>
     <VTable>
       <tbody>
+        <tr>
+          <td>{{ $t('Firmware version') }}</td>
+          <td>{{ sysinfo?.fw_ver }}</td>
+        </tr>
+        <tr>
+          <td>{{ $t('Web version') }}</td>
+          <td>{{ version }}</td>
+        </tr>
         <tr>
           <td>{{ $t('Uptime') }}</td>
           <td>{{ uptime.days }}{{ $t('d') }} {{ uptime.hours }}{{ $t('h') }} {{ uptime.minutes }}{{ $t('m') }}</td>

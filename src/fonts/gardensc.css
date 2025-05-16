@@ -1,0 +1,12 @@
+@font-face {
+    font-family: 'GardensC';
+    src: url('GardensC.eot');
+    src: url('GardensC.eot?#iefix') format('embedded-opentype'),
+    url('GardensC.woff2') format('woff2'),
+    url('GardensC.woff') format('woff'),
+    url('GardensC.ttf') format('truetype'),
+    url('GardensC.svg#GardensC') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}

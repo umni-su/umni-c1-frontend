@@ -49,19 +49,28 @@ export default {
         {{ $t('Relays and inputs') }}
       </VTab>
       <VTab
+        value="analog"
+        prepend-icon="mdi-sine-wave"
+        class="rounded-bs-0 rounded-be-0"
+        :to="{name:'analog'}"
+      >
+        {{ $t('Analog sensors') }}
+      </VTab>
+      <VTab
+        value="rf"
+        prepend-icon="mdi-access-point"
+        class="rounded-bs-0 rounded-be-0"
+        :to="{name:'rf_panel'}"
+      >
+        {{ $t('Radio channel') }}
+      </VTab>
+      <VTab
         value="1wire"
         prepend-icon="mdi-network"
         class="rounded-bs-0 rounded-be-0"
         :to="{name:'one_wire_panel'}"
       >
         {{ $t('1-wire') }}
-      </VTab>
-      <VTab
-        value="relays"
-        prepend-icon="mdi-lan"
-        class="rounded-bs-0 rounded-be-0"
-      >
-        {{ $t('CAN bus') }}
       </VTab>
     </VTabs>
     <VTabsWindow

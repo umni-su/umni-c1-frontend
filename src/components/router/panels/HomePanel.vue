@@ -17,11 +17,23 @@ export default {
     sysinfo() {
       return this.$store.getters['getSystemInfoState']
     },
+    interval() {
+      return this.$store.getters['getRefreshInterval']
+    }
+  },
+  watch: {
+    async interval() {
+      clearInterval(this.handler)
+      this.handler = setInterval(async () => {
+        await this.getSystemInfoState()
+      }, this.interval)
+      await this.getSystemInfoState()
+    }
   },
   async created() {
     this.handler = setInterval(async () => {
       await this.getSystemInfoState()
-    }, 2000)
+    }, this.interval)
     await this.getSystemInfoState()
   },
   unmounted() {

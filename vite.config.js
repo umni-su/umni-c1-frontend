@@ -2,13 +2,13 @@ import {fileURLToPath, URL} from 'node:url'
 
 import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
+//import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    //vueDevTools(),
   ],
   resolve: {
     alias: {
@@ -18,11 +18,16 @@ export default defineConfig({
   build: {
     outDir: 'public/build/www',
     emptyOutDir: true,
-    rollupOutputOptions: {
+    rollupOptions: {
       output: {
-        entryFileNames: `assets/[name].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[ext]`
+        // manualChunks: (id) => {
+        //   if (id.includes('node_modules')) {
+        //     return id.toString().split('node_modules/')[1].split('/')[0].toString();
+        //   }
+        // }
+        //entryFileNames: `assets/[name].js`,
+        //chunkFileNames: `assets/[name].js`,
+        //assetFileNames: `assets/[name].[ext]`
       }
     },
   },

@@ -4,17 +4,27 @@ export default {
   data() {
     return {
       mode: 'dio',
-      relays: null,
-      inputs: null,
+      relays: [],
+      inputs: [],
+      handler: null
     }
   },
   computed: {
     state() {
       return this.$store.getters['getDioState']
+    },
+    interval() {
+      return this.$store.getters['getRefreshInterval']
     }
   },
   async created() {
     await this.getState()
+    this.handler = setInterval(async () => {
+      await this.getState()
+    }, this.interval)
+  },
+  unmounted() {
+    clearInterval(this.handler)
   },
   methods: {
     async switchRelay(relay) {
@@ -31,6 +41,12 @@ export default {
       await this.$store.dispatch('getDioState')
       this.relays = this.state.do
       this.inputs = this.state.di
+      this.relays.sort((a, b) => {
+        return a.order - b.order
+      })
+      this.inputs.sort((a, b) => {
+        return a.order - b.order
+      })
     }
   }
 }
@@ -71,7 +87,7 @@ export default {
                       icon="mdi-toggle-switch-off"
                     />
                   </template>
-                  {{ relay.label === null ? $t(`Relay #{index}`, {index: relay.index}) : relay.label }}
+                  {{ relay.label === null ? $t(`Relay #{index}`, {index: (relay.index + 1)}) : relay.label }}
                 </VBtn>
               </VCol>
             </VRow>
@@ -93,14 +109,14 @@ export default {
               >
                 <VBtn
                   readonly
-                  :color="input.state === 1 ? 'primary' : 'secondary'"
+                  :color="input.state === 1 ? 'orange' : 'secondary'"
                   variant="tonal"
                   width="100%"
                 >
                   <template #prepend>
                     <VIcon
                       v-if="input.state === 1"
-                      icon="mdi-bell"
+                      icon="mdi-bell-ring"
                     />
                     <VIcon
                       v-else

@@ -46,11 +46,26 @@ export default {
         {{ $t('Network') }}
       </VTab>
       <VTab
+        value="climate"
+        prepend-icon="mdi-thermostat"
+        :to="{name:'settings_ot'}"
+      >
+        {{ $t('Climate') }}
+      </VTab>
+      <VTab
         value="sensors"
         prepend-icon="mdi-dip-switch"
         :to="{name:'settings_dio'}"
       >
         {{ $t('Sensors') }}
+      </VTab>
+
+      <VTab
+        value="rf"
+        prepend-icon="mdi-access-point"
+        :to="{name:'settings_rf'}"
+      >
+        {{ $t('Radio channel') }}
       </VTab>
       <VTab
         value="1wire"
@@ -60,16 +75,11 @@ export default {
         {{ $t('1-wire') }}
       </VTab>
       <VTab
-        value="auto"
+        value="api"
         prepend-icon="mdi-arrow-decision"
+        :to="{name:'settings_api'}"
       >
         {{ $t('Automation') }}
-      </VTab>
-      <VTab
-        value="auto"
-        prepend-icon="mdi-lan"
-      >
-        {{ $t('CAN bus') }}
       </VTab>
     </VTabs>
     <VWindow

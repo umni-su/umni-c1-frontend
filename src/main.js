@@ -39,13 +39,17 @@ const vuetify = createVuetify({
       variant: 'outlined',
       hideDetails: true,
       density: 'compact',
-      class: 'mb-4'
     },
     VSelect: {
       variant: 'outlined',
       hideDetails: true,
       density: 'compact',
-      class: 'mb-4'
+    },
+    VAutocomplete: {
+      hideDetails: true,
+    },
+    VContainer: {
+      fluid: true
     },
     VCheckbox: {
       hideDetails: true,

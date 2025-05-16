@@ -16,6 +16,12 @@ export default {
     },
     loading() {
       return this.$store.getters['isLoading']
+    },
+    macname() {
+      return this.$store.getters['getMacname']
+    },
+    theme() {
+      return this.$store.getters['getTheme']
     }
   },
   methods: {
@@ -36,7 +42,8 @@ export default {
   >
     <VContainer
       fluid
-      class="fill-height bg-primary"
+      :class="theme === 'light'?'bg-primary': 'default'"
+      class="fill-height"
     >
       <VRow class="install-block">
         <VCol
@@ -44,20 +51,33 @@ export default {
           class="left d-flex align-center justify-center"
         >
           <VCard
-            color="primary-darken"
+            elevation="10"
             class="pa-4 d-flex align-center justify-center flex-column"
             width="340"
             height="100%"
           >
-            <UmniLogo class="mb-4" />
+            <UmniLogo
+              :width="250"
+              :height="70"
+              :short="false"
+              class="mb-1 mx-auto"
+              color="#008dd2"
+            />
+            <div class="text-subtitle-2 mb-4 opacity-50">
+              {{ macname?.toUpperCase() }}
+            </div>
             <VForm class="w-100">
               <VTextField
                 v-model="username"
+                autocomplete="off"
+                class="mb-4"
                 prepend-inner-icon="mdi-account"
                 :label="$t('User')"
               />
               <VTextField
                 v-model="password"
+                autocomplete="off"
+                class="mb-4"
                 prepend-inner-icon="mdi-key"
                 type="password"
                 :label="$t('Password')"
@@ -67,6 +87,7 @@ export default {
                 :disabled="disable"
                 prepend-icon="mdi-send"
                 class="w-100"
+                color="primary-darken"
                 :text="$t('Login')"
                 @click="login"
               />
