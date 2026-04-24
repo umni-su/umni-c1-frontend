@@ -4,13 +4,16 @@ export default {
   name: 'DateTimeWidget',
   computed: {
     sysinfo() {
-      return this.$store.getters['getSystemInfoState']
+      return this.$store.getters['getSystemInfo']
     },
     date() {
       return this.sysinfo !== null ? new Date(this.sysinfo?.date) : new Date()
     },
     hostname() {
-      return this.$store.getters['getHostname']
+      return this.$store.getters['getHostname'].toUpperCase()
+    },
+    capabilities(){
+      return this.$store.getters['getCapabilities']
     },
     day() {
       return this.date.getDate().toString().padStart(2, '0')
@@ -30,14 +33,14 @@ export default {
     variant="tonal"
   >
     <VCardText class="datetime">
-      <div class="date mb-4">
-        {{ day }}.{{ month }}.{{ date.getFullYear() }}
-      </div>
-      <div class="time">
-        {{ date.toTimeString().substring(0, 5) }}
-      </div>
-      <div class="hostname">
+      <div class="text-display-medium font-weight-black">
         {{ hostname }}
+      </div>
+      <div class="text-body-small mt-1">
+        {{ $t('Allowed capabilities') }}
+      </div>
+      <div class="text-center mt-4">
+        <VChip size="small" class="mr-1 mb-1" v-for="cap in capabilities" :key="cap" :text="cap" rounded="pill"></VChip>
       </div>
     </VCardText>
   </VCard>

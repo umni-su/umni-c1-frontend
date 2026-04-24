@@ -8,8 +8,8 @@ export default {
   name: "DefaultPage",
   components: {DebugSwitcher, ThemeSwitcher, UmniLogo, AppLoader},
   computed: {
-    macname() {
-      return this.$store.getters['getMacname']
+    hostname(){
+      return this.$store.getters['getHostname']?.toUpperCase();
     },
     theme() {
       return this.$store.getters['getTheme']
@@ -40,23 +40,12 @@ export default {
 </script>
 
 <template>
-  <VSheet
-    :color="theme === 'light' ? 'primary' : 'secondary'"
-    :class="!$vuetify.display.xs ? 'pa-10' : 'pa-1'"
 
-    rounded="0"
-    height="100%"
-  >
-    <VCard
-      max-width="1200px"
-      width="100%"
-      class="mx-auto h-100"
-    >
       <VLayout full-height>
         <VAppBar
-          :theme="theme"
-          class="pa-1"
           elevation="0"
+          color="primary"
+          :theme="theme"
           rounded="0"
         >
           <template #prepend>
@@ -66,16 +55,16 @@ export default {
               :to="{name:'home_panel'}"
             >
               <UmniLogo
-                :fill="theme === 'light'?'#008dd2' : 'white'"
-                :width="40"
-                :height="40"
+                :fill="theme === 'light'?'white' : 'white'"
+                :width="50"
+                :height="50"
                 class="pa-1 pt-2"
               />
             </VAppBarNavIcon>
           </template>
           <template #title>
-            <div class="text-h6">
-              {{ macname?.toUpperCase() }}
+            <div class="text-headline font-weight-black">
+              {{hostname}}
             </div>
           </template>
           <template #append>
@@ -127,15 +116,14 @@ export default {
             />
           </template>
         </VAppBar>
-        <VMain>
+        <VMain class="fill-height">
           <VSheet
-            class="pa-4 pt-2"
-            height="100%"
-            width="100%"
-            color="transparent"
+            class="fill-height mx-auto"
+            rounded="0"
+            max-width="1200"
           >
             <VSheet
-              height="100%"
+              class="fill-height"
               width="100%"
               color="transparent"
             >
@@ -145,8 +133,6 @@ export default {
           </VSheet>
         </VMain>
       </VLayout>
-    </VCard>
-  </VSheet>
 </template>
 
 <style scoped>

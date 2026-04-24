@@ -7,7 +7,10 @@ export default {
   name: 'SystemInfoWidget',
   computed: {
     sysinfo() {
-      return this.$store.getters['getSystemInfoState']
+      return this.$store.getters['getSystemInfo']
+    },
+    heap() {
+      return this.$store.getters['getHeapInfo']
     },
     lastReset() {
       const date = new Date(this.sysinfo?.last_reset)
@@ -17,10 +20,10 @@ export default {
       return resetErrorCodeToString(this.sysinfo?.reset_reason)
     },
     freeHeap() {
-      return this.sysinfo?.free_heap
+      return this.heap.free
     },
     totalHeap() {
-      return this.sysinfo?.total_heap
+      return this.heap.total
     },
     usage() {
       return ((this.totalHeap - this.freeHeap) * 100 / this.totalHeap).toFixed(2)
@@ -98,16 +101,8 @@ export default {
           <td>{{ usage }}%</td>
         </tr>
         <tr>
-          <td>{{ $t('Last reset') }}</td>
-          <td>{{ lastReset }}</td>
-        </tr>
-        <tr>
           <td>{{ $t('Reset reason') }}</td>
           <td>{{ resetReason }}</td>
-        </tr>
-        <tr>
-          <td>{{ $t('Chip and revision') }}</td>
-          <td>{{ chipInfoToString(sysinfo.chip) }} REV{{ sysinfo.revision }}</td>
         </tr>
       </tbody>
     </VTable>

@@ -2,36 +2,31 @@ export default {
   theme: localStorage.getItem('theme') !== null ? localStorage.getItem('theme') : 'light',
   loading: false,
   debug: false,
-  authenticated: false,
-  installed: false,
-  settings: [],
-  notifications: [],
-  refreshInterval: 10000,
-  hostname: null,
-  macname: null,
+
   state: {
-    ai: {},
-    info: null,
-    rf: null,
-    ot: null,
-    dio: {
-      do: [],
-      di: []
-    },
-    ow: null,
+    info: null,        // systeminfo
+    adc: null,         // adc channels
+    ntc: null,         // ntc channels
+    dio: null,         // digital inputs/outputs
+    ow: null,          // onewire sensors
+    rf: null,          // rf433 devices
+    ot: null,          // opentherm status
   },
+
   charts: {
-    time: [],
-    ntc1: [],
-    ntc2: [],
-    ai1: [],
-    ai2: [],
-    ow: [],
-    timeOw: [],
+    time: [],          // общий массив времени для adc/ntc
+    adc1: [],          // значение ADC канал 0
+    adc2: [],          // значение ADC канал 1
+    ntc1: [],          // значение NTC канал 0
+    ntc2: [],          // значение NTC канал 1
+    timeOw: [],        // массив времени для onewire
+    ow: [],            // массив серий датчиков onewire
     ot: {
-      modulation: [],
-      ch: []
+      modulation: [],  // [(time, value), ...]
+      temperature: []  // температура котла
     }
   },
-  version: null
+
+  version: null,
+  refreshInterval: 5000
 }

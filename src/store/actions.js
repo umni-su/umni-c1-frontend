@@ -1,267 +1,197 @@
 import axios from 'axios'
-import dateToStringDateTime from "@/helpers/dateToStringDateTime.js";
+import dateToStringDateTime from "@/helpers/dateToStringDateTime.js"
 
+// eslint-disable-next-line no-undef
 window.axios = axios
+// eslint-disable-next-line no-undef
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-const ADMIN = '/adm/'
+const API = '/api/'
 
 export default {
-  async checkAuth({commit}) {
+  /** SYSTEM INFO **/
+  async getSystemInfo({ commit, state }) {
+    if (state.loading) return false
     commit('setLoading', true)
-    const url = `${ADMIN}auth/check`
-    const res = await axios.get(url).catch(e => {
-      commit('setAuthenticated', false)
-      commit('setInstalled', e.response.data.installed)
-      commit('setMacname', e.response.data.macname)
+
+    const res = await axios.get(`${API}systeminfo`).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      commit('setSystemInfo', res.data.data)
+      if (res.data.data.hostname) {
+        const version = res.data.data.hostname.split('-')[1]
+        commit('setVersion', version)
+      }
+    }
+  },
+
+  /** ADC **/
+  async getAdcState({ commit, state }) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    const res = await axios.get(`${API}adc`).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      const datetime = dateToStringDateTime()
+      const channels = res.data.data.channels || []
+      const adc1 = channels.find(c => c.id === 0)?.value
+      const adc2 = channels.find(c => c.id === 1)?.value
+
+      commit('pushAdcData', { datetime, adc1, adc2 })
+      commit('setAdcState', res.data.data)
+    }
+  },
+
+  /** NTC **/
+  async getNtcState({ commit, state }) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    const res = await axios.get(`${API}ntc`).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      const channels = res.data.data.channels || []
+      const ntc1 = channels.find(c => c.id === 0)?.value?.toFixed(2)
+      const ntc2 = channels.find(c => c.id === 1)?.value?.toFixed(2)
+
+      commit('pushNtcData', { ntc1, ntc2 })
+      commit('setNtcState', res.data.data)
+    }
+  },
+
+  /** DIO (Digital Inputs/Outputs) **/
+  async getDioState({ commit, state }) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    const res = await axios.get(`${API}dio`).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      commit('setDioState', res.data.data)
+    }
+  },
+
+  /** ONEWIRE **/
+  async getOneWireState({ commit, state }) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    const res = await axios.get(`${API}onewire`).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      const datetime = dateToStringDateTime()
+      const sensors = res.data.data.sensors || []
+
+      commit('updateOneWireChart', { datetime, sensors })
+      commit('setOneWireState', sensors)
+    }
+  },
+
+  /** RF433 **/
+  async getRf433State({ commit, state }) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    const res = await axios.get(`${API}rf433`).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      commit('setRf433State', res.data.data)
+    }
+  },
+
+  /** OPENTHERM **/
+  async getOpenThermState({ commit, state }) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    const res = await axios.get(`${API}opentherm`).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      const datetime = dateToStringDateTime()
+      const modulation = res.data.data.modulation
+      const temperature = res.data.data.boiler_temperature
+
+      commit('pushOpenThermData', { datetime, modulation, temperature })
+      commit('setOpenThermState', res.data.data)
+    }
+  },
+
+  /** SETTINGS (GET и SAVE) **/
+  async getSetting({ commit, state }, setting) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    const res = await axios.post(`${API}settings`, { setting }).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      return res.data.data
+    }
+    return null
+  },
+
+  async saveSetting({ commit }, { setting, values }) {
+    commit('setLoading', true)
+
+    const res = await axios.post(`${API}settings`, { setting, values }).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      return res.data
+    }
+    return null
+  },
+
+  /** SWITCH RELAY **/
+  async switchRelay({ commit }, { index, state }) {
+    commit('setLoading', true)
+
+    const res = await axios.post(`${API}switch`, {
+      type: 'output',
+      index,
+      state
     }).finally(() => {
-      commit('setLoading', false);
+      commit('setLoading', false)
     })
-    if (res) {
-      commit('setMacname', res?.data?.macname)
-      commit('setHostname', res?.data?.hostname)
-      commit('setAuthenticated', res?.data?.success)
-      commit('setInstalled', res?.data?.installed)
-    }
-  },
-  async install({commit}, data) {
-    commit('setLoading', true)
-    const res = await axios.post(`${ADMIN}install`, data).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      if (res.data.success === true) {
-        commit('setInstalled', true)
-      }
-    }
-  },
-  async logIn({commit}, data) {
-    commit('setLoading', true)
-    const res = await axios.post(`${ADMIN}auth/login`, data).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      commit('setAuthenticated', res.data.success)
-      commit('setMacname', res.data?.macname)
-      commit('setHostname', res.data?.hostname)
-    }
-  },
-  async logOut({commit}) {
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}auth/logout`).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      commit('setAuthenticated', false)
-    }
-  },
-  async reboot({commit}) {
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}reboot`).finally(() => {
-      commit('setLoading', false);
-    })
-    return res.data
-  },
-  async factoryReset({commit}) {
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}reset`).finally(() => {
-      commit('setLoading', false);
-    })
-    return res.data
-  },
-  /** STATE **/
-  async getSystemInfoState({commit, state}) {
-    if (state.loading) return false
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}st/info`).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      commit('setSystemInfoState', res.data)
-    }
-  },
-  async getAnalogState({commit, state}) {
-    if (state.loading) return false
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}st/ai`).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      const dateStr = dateToStringDateTime()
-      state.charts.time.push(dateStr)
-      state.charts.ntc1.push(res.data.ntc1?.value?.toFixed(2))
-      state.charts.ntc2.push(res.data.ntc2?.value?.toFixed(2))
-      state.charts.ai1.push(res.data.ai1?.value)
-      state.charts.ai2.push(res.data.ai2?.value)
-      if (state.charts.time.length > 50) {
-        state.charts.time.shift()
-        state.charts.ntc1.shift()
-        state.charts.ntc2.shift()
-        state.charts.ai1.shift()
-        state.charts.ai2.shift()
-      }
-      commit('setAnalogState', res.data)
-    }
-  },
-  async getOpenThermState({commit, state}) {
-    if (state.loading) return false
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}st/ot`).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      commit('setOpenThermState', res.data)
-      const dateStr = dateToStringDateTime()
-      const modulation = res.data.modulation
-      const chTemp = res.data.boiler_temperature
 
-      if (typeof modulation === 'number') {
-        state.charts.ot.modulation.push([dateStr, modulation])
-        if (state.charts.ot.modulation.length > 50) {
-          state.charts.ot.modulation.shift()
-        }
-      }
-      if (typeof chTemp === 'number') {
-        state.charts.ot.ch.push([dateStr, chTemp])
-        if (state.charts.ot.ch.length > 50) {
-          state.charts.ot.ch.shift()
-        }
-      }
-    }
-  },
-  async getRfState({commit, state}) {
-    if (state.loading) return false
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}st/rf`).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      commit('setRfState', res.data)
-    }
-  },
-  async scanRfSensors({commit, state}) {
-    if (state.loading) return false
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}rf/scan`).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
+    if (res?.data?.success) {
+      commit('updateRelayState', { index, state })
       return res.data
     }
-  },
-  async resetBoilerErrors({commit}) {
-    commit('setLoading', true)
-    const res = await axios.post(`${ADMIN}st/ot/reset`).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      return res.data
-    }
-  },
-  async getOneWireState({commit, state}) {
-    if (state.loading) return false
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}st/ow`).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      const dateStr = dateToStringDateTime()
-      if (state.charts.timeOw.length === 0) {
-        state.charts.ow = res.data.map(ow => {
-          const val = ow?.temp?.toFixed(2)
-          return {
-            type: 'line',
-            name: ow.label !== null ? ow.label : ow.sn,
-            sn: ow.sn,
-            smooth: true,
-            emphasis: {
-              focus: 'series'
-            },
-            symbolSize: 10,
-            markPoint: {
-              symbolSize: 70,
-              data: [
-                {type: 'max', name: 'Max'},
-                {type: 'min', name: 'Min'}
-              ]
-            },
-            data: [val]
-          }
-        })
-      } else {
-        for (const ow of res.data) {
-          const index = state.charts.ow.findIndex(sensor => sensor.sn === ow.sn)
-          if (index > -1) {
-            const val = ow?.temp?.toFixed(2)
-            state.charts.ow[index].data.push(val)
-            if (state.charts.ow[index].data.length > 50) {
-              state.charts.ow[index].data.shift()
-            }
-          }
-        }
-      }
-      state.charts.timeOw.push(dateStr)
-      //state.charts.ow.push(res.data.ntc1?.temp?.toFixed(2))
-      if (state.charts.timeOw.length > 50) {
-        state.charts.timeOw.shift()
-      }
-      commit('setOneWireState', res.data)
-    }
-  },
-  async getDioState({commit, state}) {
-    if (state.loading) return false
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}st/dio`).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      commit('setDioState', res.data)
-    }
-  },
-  async getNvsSettings({commit, state}) {
-    if (state.loading) return false
-    commit('setLoading', true)
-    const res = await axios.get(`${ADMIN}settings`).finally(() => {
-      commit('setLoading', false);
-    })
-    commit('setSettings', res.data)
-    return res.data
-  },
-  async saveNvsSettings({commit}, data) {
-    commit('setLoading', true)
-    const res = await axios.post(`${ADMIN}settings`, data).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res && res.status === 200) {
-      return res.data
-    }
-  },
-  async setState({commit}, data) {
-    commit('setLoading', true)
-    const res = await axios.post(`${ADMIN}st`, data).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      switch (data.type) {
-        case 'ot':
-          //commit('setOpenThermState', data.state)
-          break;
-        case 'dio':
-          commit('updateRelayState', data.state)
-          break;
-        default:
-          break
-      }
-      return res.data
-    }
+    return null
   },
 
-  async startUpdates({commit}, data) {
-    commit('setLoading', true)
-    const res = await axios.post(`${ADMIN}update`, data).finally(() => {
-      commit('setLoading', false);
-    })
-    if (res) {
-      return res.data
-    }
+  /** ВСЕ ДАННЫЕ СРАЗУ (для оптимизации) **/
+  async getAllData({ dispatch }) {
+    await Promise.all([
+      dispatch('getSystemInfo'),
+      dispatch('getAdcState'),
+      dispatch('getNtcState'),
+      dispatch('getDioState'),
+      dispatch('getOneWireState'),
+      dispatch('getRf433State'),
+      dispatch('getOpenThermState')
+    ])
   },
+
+  /** RESET CHARTS **/
+  async resetCharts({ commit }) {
+    commit('resetCharts')
+  }
 }

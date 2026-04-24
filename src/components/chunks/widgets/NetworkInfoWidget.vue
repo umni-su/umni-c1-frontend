@@ -9,10 +9,10 @@ export default {
   },
   computed: {
     sysinfo() {
-      return this.$store.getters['getSystemInfoState']
+      return this.$store.getters['getSystemInfo']
     },
     netif() {
-      return this.sysinfo.netif
+      return this.sysinfo.networks
     }
   },
   methods: {

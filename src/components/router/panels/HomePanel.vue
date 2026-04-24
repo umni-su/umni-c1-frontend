@@ -1,12 +1,12 @@
 <script>
-import DateTimeWidget from "@/components/chunks/widgets/DateTimeWidget.vue";
+import DeviceInformationWidget from "@/components/chunks/widgets/DeviceInformationWidget.vue";
 import NetworkInfoWidget from "@/components/chunks/widgets/NetworkInfoWidget.vue";
 import SystemInfoWidget from "@/components/chunks/widgets/SystemInfoWidget.vue";
-import MQTTInfoWidget from "@/components/chunks/widgets/MQTTInfoWidget.vue";
+import UsefulWidget from "@/components/chunks/widgets/UsefulWidget.vue";
 
 export default {
   name: "HomePanel",
-  components: {MQTTInfoWidget, SystemInfoWidget, NetworkInfoWidget, DateTimeWidget},
+  components: {UsefulWidget, SystemInfoWidget, NetworkInfoWidget, DeviceInformationWidget},
   data() {
     return {
       data: null,
@@ -15,7 +15,7 @@ export default {
   },
   computed: {
     sysinfo() {
-      return this.$store.getters['getSystemInfoState']
+      return this.$store.getters['getSystemInfo']
     },
     interval() {
       return this.$store.getters['getRefreshInterval']
@@ -25,23 +25,23 @@ export default {
     async interval() {
       clearInterval(this.handler)
       this.handler = setInterval(async () => {
-        await this.getSystemInfoState()
+        await this.getSystemInfo()
       }, this.interval)
-      await this.getSystemInfoState()
+      await this.getSystemInfo()
     }
   },
   async created() {
     this.handler = setInterval(async () => {
-      await this.getSystemInfoState()
+      await this.getSystemInfo()
     }, this.interval)
-    await this.getSystemInfoState()
+    await this.getSystemInfo()
   },
   unmounted() {
     clearInterval(this.handler)
   },
   methods: {
-    async getSystemInfoState() {
-      await this.$store.dispatch('getSystemInfoState')
+    async getSystemInfo() {
+      await this.$store.dispatch('getSystemInfo')
     }
   }
 }
@@ -66,13 +66,13 @@ export default {
             cols="12"
             md="6"
           >
-            <DateTimeWidget />
+            <DeviceInformationWidget />
           </VCol>
           <VCol
             cols="12"
             md="6"
           >
-            <MQTTInfoWidget />
+            <UsefulWidget />
           </VCol>
           <VCol
             cols="12"

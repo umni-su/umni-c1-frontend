@@ -3,30 +3,43 @@
   "version": "1.1.0-alpha",
   "private": true,
   "type": "module",
+  "links": {
+    "site": "https://umni.su",
+    "docs": "https://docs.umni.su",
+    "api": "https://docs.umni.su/books/prosivka-umni-uni/page/rest-api-v10"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "update:check": "ncu",
+    "update:interactive": "ncu -i",
+    "update:patch": "ncu -u --target patch && npm install --legacy-peer-deps",
+    "update:minor": "ncu -u --target minor && npm install --legacy-peer-deps",
+    "update:latest": "ncu -u --target latest && npm install --legacy-peer-deps",
+    "update:full": "npm run update:clean && npm run update:latest",
+    "update:clean": "rimraf node_modules package-lock.json",
+    "update:reinstall": "npm run update:clean && npm install --legacy-peer-deps"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
-    "axios": "^1.9.0",
-    "echarts": "^5.6.0",
-    "vue": "^3.5.13",
-    "vue-i18n": "^11.1.2",
-    "vue-router": "^4.5.0",
+    "axios": "^1.15.2",
+    "echarts": "^6.0.0",
+    "vue": "^3.5.33",
+    "vue-i18n": "^11.4.0",
+    "vue-router": "^5.0.6",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.14.0",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "eslint": "^9.14.0",
-    "eslint-plugin-vue": "^9.30.0",
-    "sass-embedded": "^1.83.4",
-    "vite": "^6.3.5",
-    "vite-plugin-vue-devtools": "^7.6.8",
-    "vite-plugin-vuetify": "^2.0.4",
-    "vuetify": "^3.7.7"
+    "@eslint/js": "^10.0.1",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "eslint": "^10.2.1",
+    "eslint-plugin-vue": "^10.9.0",
+    "sass-embedded": "^1.99.0",
+    "vite": "^8.0.10",
+    "vite-plugin-vue-devtools": "^8.1.1",
+    "vite-plugin-vuetify": "^2.1.3",
+    "vuetify": "^4.0.6"
   }
 }

@@ -1,6 +1,8 @@
 export default {
-  setVersion(state, version) {
-    state.version = version
+  // UI mutations
+  setTheme(state, theme) {
+    localStorage.setItem('theme', theme)
+    state.theme = theme
   },
   setLoading(state, loading) {
     state.loading = loading
@@ -8,64 +10,153 @@ export default {
   setDebug(state, debug) {
     state.debug = debug
   },
-  setHostname(state, hostname) {
-    state.hostname = hostname
+  setRefreshInterval(state, interval) {
+    state.refreshInterval = interval
   },
-  setMacname(state, macname) {
-    state.macname = macname
+  setVersion(state, version) {
+    state.version = version
   },
-  setAuthenticated(state, authenticated) {
-    state.authenticated = authenticated
-  },
-  setInstalled(state, installed) {
-    state.installed = installed
-  },
-  setTheme(state, theme) {
-    localStorage.setItem('theme', theme)
-    state.theme = theme
-  },
-  setRefreshInterval(state, int) {
-    return state.refreshInterval = int
-  },
-  setSystemInfoState(state, info) {
+
+  // System Info
+  setSystemInfo(state, info) {
     state.state.info = info
   },
-  setAnalogState(state, ai) {
-    state.state.ai = ai
+
+  // ADC
+  setAdcState(state, adc) {
+    state.state.adc = adc
   },
-  setRfState(state, rf) {
-    state.state.rf = rf
+
+  // NTC
+  setNtcState(state, ntc) {
+    state.state.ntc = ntc
   },
-  setDioState(state, info) {
-    state.state.dio = info
+
+  // DIO
+  setDioState(state, dio) {
+    state.state.dio = dio
   },
-  updateRelayState(state, relay) {
-    const index = state.state.dio.do.findIndex(r => r.index === relay.index)
-    if (index > -1) {
-      state.state.dio.do[index].state = state.state.dio.do[index].state === 1 ? 0 : 1
+
+  // OneWire
+  setOneWireState(state, sensors) {
+    state.state.ow = sensors
+  },
+
+  // RF433
+  setRf433State(state, devices) {
+    state.state.rf = devices
+  },
+
+  // OpenTherm
+  setOpenThermState(state, ot) {
+    state.state.ot = ot
+  },
+
+  // Charts mutations
+  pushAdcData(state, { datetime, adc1, adc2 }) {
+    state.charts.time.push(datetime)
+    state.charts.adc1.push(adc1)
+    state.charts.adc2.push(adc2)
+
+    if (state.charts.time.length > 50) {
+      state.charts.time.shift()
+      state.charts.adc1.shift()
+      state.charts.adc2.shift()
     }
   },
-  setOneWireState(state, info) {
-    state.state.ow = info
+
+  pushNtcData(state, { ntc1, ntc2 }) {
+    // time уже есть из ADC, но для синхронизации используем тот же массив
+    if (state.charts.ntc1.length === state.charts.time.length - 1) {
+      state.charts.ntc1.push(ntc1)
+      state.charts.ntc2.push(ntc2)
+
+      if (state.charts.ntc1.length > 50) {
+        state.charts.ntc1.shift()
+        state.charts.ntc2.shift()
+      }
+    }
   },
-  setOpenThermState(state, info) {
-    state.state.ot = info
+
+  pushOpenThermData(state, { datetime, modulation, temperature }) {
+    if (typeof modulation === 'number') {
+      state.charts.ot.modulation.push([datetime, modulation])
+      if (state.charts.ot.modulation.length > 50) {
+        state.charts.ot.modulation.shift()
+      }
+    }
+
+    if (typeof temperature === 'number') {
+      state.charts.ot.temperature.push([datetime, temperature])
+      if (state.charts.ot.temperature.length > 50) {
+        state.charts.ot.temperature.shift()
+      }
+    }
   },
-  setSettings(state, settings) {
-    state.settings = settings
-  },
-  addNotification(state, notification) {
-    state.notifications.push(notification)
-  },
-  removeNotification(state) {
-    state.notifications = state.notifications.filter(n => n.active === true)
-  },
-  addSetting(state, {key, value}) {
-    const index = state.settings.findIndex(s => s.key === key)
-    if (index > -1) {
-      state.settings[index][key] = value
+
+  updateOneWireChart(state, { datetime, sensors }) {
+    // Инициализация графиков для датчиков
+    if (state.charts.timeOw.length === 0) {
+      state.charts.ow = sensors.map(sensor => ({
+        type: 'line',
+        name: sensor.label !== null ? sensor.label : sensor.sn,
+        sn: sensor.sn,
+        smooth: true,
+        emphasis: { focus: 'series' },
+        symbolSize: 10,
+        markPoint: {
+          symbolSize: 70,
+          data: [
+            { type: 'max', name: 'Max' },
+            { type: 'min', name: 'Min' }
+          ]
+        },
+        data: [sensor?.temp?.toFixed(2)]
+      }))
     } else {
-      state.settings.push({key, value})
+      // Обновление существующих датчиков
+      for (const sensor of sensors) {
+        const index = state.charts.ow.findIndex(s => s.sn === sensor.sn)
+        if (index > -1) {
+          const val = sensor?.temp?.toFixed(2)
+          state.charts.ow[index].data.push(val)
+          if (state.charts.ow[index].data.length > 50) {
+            state.charts.ow[index].data.shift()
+          }
+        }
+      }
+    }
+
+    state.charts.timeOw.push(datetime)
+    if (state.charts.timeOw.length > 50) {
+      state.charts.timeOw.shift()
+    }
+  },
+
+  updateRelayState(state, { index, state: relayState }) {
+    if (state.state.dio?.outputs) {
+      const relayIndex = state.state.dio.outputs.findIndex(
+        r => r.config_index === index || r.port_index === index
+      )
+      if (relayIndex > -1 && state.state.dio.outputs[relayIndex]) {
+        state.state.dio.outputs[relayIndex].state = relayState
+      }
+    }
+  },
+
+  resetCharts(state) {
+    state.charts = {
+      time: [],
+      adc1: [],
+      adc2: [],
+      ntc1: [],
+      ntc2: [],
+      timeOw: [],
+      ow: [],
+      ot: {
+        modulation: [],
+        temperature: []
+      }
     }
   }
 }

@@ -55,6 +55,10 @@ const vuetify = createVuetify({
       hideDetails: true,
       density: 'compact',
     },
+    VProgressLinear:{
+      height:6,
+      rounded: 'lg'
+    },
     VBtn: {
       density: 'default',
       color: 'primary',
