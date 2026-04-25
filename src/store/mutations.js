@@ -17,42 +17,34 @@ export default {
     state.version = version
   },
 
-  // System Info
+  // /api/systeminfo
   setSystemInfo(state, info) {
     state.state.info = info
   },
 
-  // ADC
-  setAdcState(state, adc) {
-    state.state.adc = adc
+  // /api/conf
+  setAdcConf(state, adc) {
+    state.state.conf.adc = adc
+  },
+  setNtcConf(state, ntc) {
+    state.state.conf.ntc = ntc
+  },
+  setDioConf(state, dio) {
+    state.state.conf.dio = dio
+  },
+  setOneWireConf(state, onewire) {
+    state.state.conf.onewire = onewire
+  },
+  setRf433Conf(state, rf433) {
+    state.state.conf.rf433 = rf433
   },
 
-  // NTC
-  setNtcState(state, ntc) {
-    state.state.ntc = ntc
+  // /api/state
+  setOpenThermData(state, data) {
+    state.state.sensorData.opentherm = data
   },
 
-  // DIO
-  setDioState(state, dio) {
-    state.state.dio = dio
-  },
-
-  // OneWire
-  setOneWireState(state, sensors) {
-    state.state.ow = sensors
-  },
-
-  // RF433
-  setRf433State(state, devices) {
-    state.state.rf = devices
-  },
-
-  // OpenTherm
-  setOpenThermState(state, ot) {
-    state.state.ot = ot
-  },
-
-  // Charts mutations
+  // Charts
   pushAdcData(state, { datetime, adc1, adc2 }) {
     state.charts.time.push(datetime)
     state.charts.adc1.push(adc1)
@@ -66,36 +58,32 @@ export default {
   },
 
   pushNtcData(state, { ntc1, ntc2 }) {
-    // time уже есть из ADC, но для синхронизации используем тот же массив
-    if (state.charts.ntc1.length === state.charts.time.length - 1) {
-      state.charts.ntc1.push(ntc1)
-      state.charts.ntc2.push(ntc2)
+    state.charts.ntc1.push(ntc1)
+    state.charts.ntc2.push(ntc2)
 
-      if (state.charts.ntc1.length > 50) {
-        state.charts.ntc1.shift()
-        state.charts.ntc2.shift()
-      }
+    if (state.charts.ntc1.length > 50) {
+      state.charts.ntc1.shift()
+      state.charts.ntc2.shift()
     }
   },
 
   pushOpenThermData(state, { datetime, modulation, temperature }) {
     if (typeof modulation === 'number') {
-      state.charts.ot.modulation.push([datetime, modulation])
-      if (state.charts.ot.modulation.length > 50) {
-        state.charts.ot.modulation.shift()
+      state.charts.opentherm.modulation.push([datetime, modulation])
+      if (state.charts.opentherm.modulation.length > 50) {
+        state.charts.opentherm.modulation.shift()
       }
     }
 
     if (typeof temperature === 'number') {
-      state.charts.ot.temperature.push([datetime, temperature])
-      if (state.charts.ot.temperature.length > 50) {
-        state.charts.ot.temperature.shift()
+      state.charts.opentherm.temperature.push([datetime, temperature])
+      if (state.charts.opentherm.temperature.length > 50) {
+        state.charts.opentherm.temperature.shift()
       }
     }
   },
 
   updateOneWireChart(state, { datetime, sensors }) {
-    // Инициализация графиков для датчиков
     if (state.charts.timeOw.length === 0) {
       state.charts.ow = sensors.map(sensor => ({
         type: 'line',
@@ -111,18 +99,16 @@ export default {
             { type: 'min', name: 'Min' }
           ]
         },
-        data: [sensor?.temp?.toFixed(2)]
+        data: []
       }))
-    } else {
-      // Обновление существующих датчиков
-      for (const sensor of sensors) {
-        const index = state.charts.ow.findIndex(s => s.sn === sensor.sn)
-        if (index > -1) {
-          const val = sensor?.temp?.toFixed(2)
-          state.charts.ow[index].data.push(val)
-          if (state.charts.ow[index].data.length > 50) {
-            state.charts.ow[index].data.shift()
-          }
+    }
+
+    for (const sensor of sensors) {
+      const index = state.charts.ow.findIndex(s => s.sn === sensor.sn)
+      if (index > -1 && sensor.temp) {
+        state.charts.ow[index].data.push(sensor.temp.toFixed(2))
+        if (state.charts.ow[index].data.length > 50) {
+          state.charts.ow[index].data.shift()
         }
       }
     }
@@ -134,12 +120,12 @@ export default {
   },
 
   updateRelayState(state, { index, state: relayState }) {
-    if (state.state.dio?.outputs) {
-      const relayIndex = state.state.dio.outputs.findIndex(
+    if (state.state.conf.dio?.outputs) {
+      const relayIndex = state.state.conf.dio.outputs.findIndex(
         r => r.config_index === index || r.port_index === index
       )
-      if (relayIndex > -1 && state.state.dio.outputs[relayIndex]) {
-        state.state.dio.outputs[relayIndex].state = relayState
+      if (relayIndex > -1 && state.state.conf.dio.outputs[relayIndex]) {
+        state.state.conf.dio.outputs[relayIndex].state = relayState
       }
     }
   },
@@ -153,7 +139,7 @@ export default {
       ntc2: [],
       timeOw: [],
       ow: [],
-      ot: {
+      opentherm: {
         modulation: [],
         temperature: []
       }

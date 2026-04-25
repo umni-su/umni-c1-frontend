@@ -4,26 +4,30 @@ export default {
   debug: false,
 
   state: {
-    info: null,        // systeminfo
-    adc: null,         // adc channels
-    ntc: null,         // ntc channels
-    dio: null,         // digital inputs/outputs
-    ow: null,          // onewire sensors
-    rf: null,          // rf433 devices
-    ot: null,          // opentherm status
+    info: null,           // /api/systeminfo
+    conf: {
+      adc: null,          // конфигурация ADC
+      ntc: null,          // конфигурация NTC
+      dio: null,          // конфигурация DIO (inputs/outputs)
+      onewire: null,      // конфигурация OneWire
+      rf433: null         // конфигурация RF433
+    },
+    sensorData: {
+      opentherm: null     // данные с POST /api/state {capability: "opentherm"}
+    }
   },
 
   charts: {
-    time: [],          // общий массив времени для adc/ntc
-    adc1: [],          // значение ADC канал 0
-    adc2: [],          // значение ADC канал 1
-    ntc1: [],          // значение NTC канал 0
-    ntc2: [],          // значение NTC канал 1
-    timeOw: [],        // массив времени для onewire
-    ow: [],            // массив серий датчиков onewire
-    ot: {
-      modulation: [],  // [(time, value), ...]
-      temperature: []  // температура котла
+    time: [],             // общий массив времени для adc/ntc
+    adc1: [],             // значение ADC канал 0
+    adc2: [],             // значение ADC канал 1
+    ntc1: [],             // значение NTC канал 0
+    ntc2: [],             // значение NTC канал 1
+    timeOw: [],           // массив времени для onewire
+    ow: [],               // массив серий датчиков onewire
+    opentherm: {
+      modulation: [],     // [(time, value), ...]
+      temperature: []     // температура котла
     }
   },
 

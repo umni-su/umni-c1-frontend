@@ -16,7 +16,7 @@ export default {
     return state.version
   },
 
-  // System Info
+  // System Info (/api/systeminfo)
   getSystemInfo(state) {
     return state.state.info
   },
@@ -30,190 +30,111 @@ export default {
     return state.state.info?.heap || null
   },
 
-  /** CAPABILITY CHECKS **/
+  // Проверка capabilities
   hasCapability: (state) => (capability) => {
     return state.state.info?.capabilities?.includes(capability) || false
   },
-
   hasEthernet(state) {
     return state.state.info?.capabilities?.includes('ethernet') || false
   },
-
   hasWifi(state) {
     return state.state.info?.capabilities?.includes('wifi') || false
   },
-
   hasSdCard(state) {
     return state.state.info?.capabilities?.includes('sdcard') || false
   },
-
-  hasWebServer(state) {
-    return state.state.info?.capabilities?.includes('webserver') || false
-  },
-
   hasMqtt(state) {
     return state.state.info?.capabilities?.includes('mqtt') || false
   },
-
   hasOpenTherm(state) {
     return state.state.info?.capabilities?.includes('opentherm') || false
   },
-
   hasRf433(state) {
     return state.state.info?.capabilities?.includes('rf433') || false
   },
-
   hasOneWire(state) {
     return state.state.info?.capabilities?.includes('onewire') || false
   },
-
-  hasAlarm(state) {
-    return state.state.info?.capabilities?.includes('alarm') || false
-  },
-
   hasNtc1(state) {
     return state.state.info?.capabilities?.includes('ntc1') || false
   },
-
   hasNtc2(state) {
     return state.state.info?.capabilities?.includes('ntc2') || false
   },
-
   hasAi1(state) {
     return state.state.info?.capabilities?.includes('ai1') || false
   },
-
   hasAi2(state) {
     return state.state.info?.capabilities?.includes('ai2') || false
   },
-
-  hasOpenCollectors(state) {
-    return state.state.info?.capabilities?.includes('opencollectors') || false
+  hasOutput: (state) => (num) => {
+    return state.state.info?.capabilities?.includes(`out${num}`) || false
+  },
+  hasInput: (state) => (num) => {
+    return state.state.info?.capabilities?.includes(`inp${num}`) || false
   },
 
-  hasOc1(state) {
-    return state.state.info?.capabilities?.includes('oc1') || false
+  // Конфигурации (/api/conf)
+  getAdcConf(state) {
+    return state.state.conf.adc
   },
-
-  hasOc2(state) {
-    return state.state.info?.capabilities?.includes('oc2') || false
+  getNtcConf(state) {
+    return state.state.conf.ntc
   },
-
-  hasBuzzer(state) {
-    return state.state.info?.capabilities?.includes('buzzer') || false
-  },
-
-  hasInputs(state) {
-    return state.state.info?.capabilities?.includes('inputs') || false
-  },
-
-  hasInput: (state) => (inputNumber) => {
-    return state.state.info?.capabilities?.includes(`inp${inputNumber}`) || false
-  },
-
-  hasOutputs(state) {
-    return state.state.info?.capabilities?.includes('outputs') || false
-  },
-
-  hasOutput: (state) => (outputNumber) => {
-    return state.state.info?.capabilities?.includes(`out${outputNumber}`) || false
-  },
-
-  // ADC
-  getAdcState(state) {
-    return state.state.adc
-  },
-  getAdcChannel0(state) {
-    return state.state.adc?.channels?.find(c => c.id === 0)
-  },
-  getAdcChannel1(state) {
-    return state.state.adc?.channels?.find(c => c.id === 1)
-  },
-
-  // NTC
-  getNtcState(state) {
-    return state.state.ntc
-  },
-  getNtcChannel0(state) {
-    return state.state.ntc?.channels?.find(c => c.id === 0)
-  },
-  getNtcChannel1(state) {
-    return state.state.ntc?.channels?.find(c => c.id === 1)
-  },
-
-  // DIO
-  getDioState(state) {
-    return state.state.dio
+  getDioConf(state) {
+    return state.state.conf.dio
   },
   getInputs(state) {
-    return state.state.dio?.inputs || []
+    return state.state.conf.dio?.inputs || []
   },
   getOutputs(state) {
-    return state.state.dio?.outputs || []
+    return state.state.conf.dio?.outputs || []
   },
   getRelayState: (state) => (index) => {
-    const relay = state.state.dio?.outputs?.find(r => r.config_index === index || r.port_index === index)
-    return relay?.state || relay?.default_state || 0
+    const relay = state.state.conf.dio?.outputs?.find(r => r.config_index === index || r.port_index === index)
+    return relay?.state !== undefined ? relay.state : relay?.default_state || 0
   },
-
-  // OneWire
-  getOneWireState(state) {
-    return state.state.ow
+  getOneWireConf(state) {
+    return state.state.conf.onewire
   },
   getOneWireSensors(state) {
-    return state.state.ow || []
+    return state.state.conf.onewire?.sensors || []
   },
-
-  // RF433
-  getRf433State(state) {
-    return state.state.rf
+  getRf433Conf(state) {
+    return state.state.conf.rf433
   },
   getRf433Devices(state) {
-    return state.state.rf?.devices || []
+    return state.state.conf.rf433?.devices || []
   },
 
-  // OpenTherm
-  getOpenThermState(state) {
-    return state.state.ot
-  },
-  getOpenThermCharts(state) {
-    return state.charts.ot
+  // Данные сенсоров (/api/state)
+  getOpenThermData(state) {
+    return state.state.sensorData.opentherm
   },
   getBoilerTemperature(state) {
-    return state.state.ot?.boiler_temperature || 0
+    return state.state.sensorData.opentherm?.boiler_temperature || 0
   },
   getModulation(state) {
-    return state.state.ot?.modulation || 0
+    return state.state.sensorData.opentherm?.modulation || 0
   },
   getFlameOn(state) {
-    return state.state.ot?.flame_on || false
+    return state.state.sensorData.opentherm?.flame_on || false
   },
   getPressure(state) {
-    return state.state.ot?.pressure || 0
+    return state.state.sensorData.opentherm?.pressure || 0
+  },
+  getCentralHeatingActive(state) {
+    return state.state.sensorData.opentherm?.central_heating_active || false
+  },
+  getHotWaterActive(state) {
+    return state.state.sensorData.opentherm?.hot_water_active || false
   },
 
   // Charts
   getCharts(state) {
     return state.charts
   },
-  getAdcCharts(state) {
-    return {
-      time: state.charts.time,
-      adc1: state.charts.adc1,
-      adc2: state.charts.adc2
-    }
-  },
-  getNtcCharts(state) {
-    return {
-      time: state.charts.time,
-      ntc1: state.charts.ntc1,
-      ntc2: state.charts.ntc2
-    }
-  },
-  getOneWireCharts(state) {
-    return {
-      time: state.charts.timeOw,
-      sensors: state.charts.ow
-    }
+  getOpenThermCharts(state) {
+    return state.charts.opentherm
   }
 }
