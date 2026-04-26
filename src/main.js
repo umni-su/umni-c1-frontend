@@ -55,6 +55,9 @@ const vuetify = createVuetify({
       hideDetails: true,
       density: 'compact',
     },
+    VTab:{
+      rounded:0
+    },
     VProgressLinear:{
       height:6,
       rounded: 'lg'

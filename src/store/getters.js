@@ -30,6 +30,16 @@ export default {
     return state.state.info?.heap || null
   },
 
+  getOutputs(state) {
+    return state.state.conf.outputs || []
+  },
+  getInputs(state) {
+    return state.state.conf.inputs || []
+  },
+  getOpenCollectors(state) {
+    return state.state.conf.opencollectors || []
+  },
+
   // Проверка capabilities
   hasCapability: (state) => (capability) => {
     return state.state.info?.capabilities?.includes(capability) || false
@@ -67,6 +77,15 @@ export default {
   hasAi2(state) {
     return state.state.info?.capabilities?.includes('ai2') || false
   },
+  hasOpenCollectors: (state) => {
+    return state.state.info?.capabilities?.includes(`opencollectors`) || false
+  },
+  hasOutputs: (state) => {
+    return state.state.info?.capabilities?.includes(`outputs`) || false
+  },
+  hasInputs: (state) => {
+    return state.state.info?.capabilities?.includes(`inputs`) || false
+  },
   hasOutput: (state) => (num) => {
     return state.state.info?.capabilities?.includes(`out${num}`) || false
   },
@@ -83,12 +102,6 @@ export default {
   },
   getDioConf(state) {
     return state.state.conf.dio
-  },
-  getInputs(state) {
-    return state.state.conf.dio?.inputs || []
-  },
-  getOutputs(state) {
-    return state.state.conf.dio?.outputs || []
   },
   getRelayState: (state) => (index) => {
     const relay = state.state.conf.dio?.outputs?.find(r => r.config_index === index || r.port_index === index)

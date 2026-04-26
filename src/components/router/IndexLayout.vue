@@ -8,6 +8,23 @@ export default {
       tab: null,
     }
   },
+  computed: {
+    hasOpenTherm(){
+      return this.$store.getters.hasOpenTherm
+    },
+    hasOutputs(){
+      return this.$store.getters.hasOutputs
+    },
+    hasOpenCollectors(){
+      return this.$store.getters.hasOpenCollectors
+    },
+    hasInputs(){
+      return this.$store.getters.hasInputs
+    },
+  },
+  methods: {
+
+  }
 }
 </script>
 
@@ -27,23 +44,22 @@ export default {
       <VTab
         value="home"
         prepend-icon="mdi-home"
-        class="rounded-bs-0 rounded-be-0"
         :to="{name:'home_panel'}"
       >
         {{ $t('Dashboard') }}
       </VTab>
       <VTab
+        v-if="hasOpenTherm"
         value="opentherm"
         prepend-icon="mdi-thermostat"
-        class="rounded-bs-0 rounded-be-0"
         :to="{name:'climate_panel'}"
       >
         {{ $t('Climate') }}
       </VTab>
       <VTab
+        v-if="hasOutputs || hasInputs || hasOpenCollectors"
         value="dio"
         prepend-icon="mdi-dip-switch"
-        class="rounded-bs-0 rounded-be-0"
         :to="{name:'dio_panel'}"
       >
         {{ $t('Relays and inputs') }}
@@ -51,7 +67,6 @@ export default {
       <VTab
         value="analog"
         prepend-icon="mdi-sine-wave"
-        class="rounded-bs-0 rounded-be-0"
         :to="{name:'analog'}"
       >
         {{ $t('Analog sensors') }}
@@ -59,7 +74,6 @@ export default {
       <VTab
         value="rf"
         prepend-icon="mdi-access-point"
-        class="rounded-bs-0 rounded-be-0"
         :to="{name:'rf_panel'}"
       >
         {{ $t('Radio channel') }}
@@ -67,7 +81,6 @@ export default {
       <VTab
         value="1wire"
         prepend-icon="mdi-network"
-        class="rounded-bs-0 rounded-be-0"
         :to="{name:'one_wire_panel'}"
       >
         {{ $t('1-wire') }}
@@ -77,7 +90,12 @@ export default {
       v-model="tab"
       class="full-card-window-height"
     >
-      <RouterView />
+      <VSheet
+        max-width="1200"
+        class="mx-auto pa-4 fill-height"
+      >
+        <RouterView />
+      </VSheet>
     </VTabsWindow>
   </VSheet>
 </template>

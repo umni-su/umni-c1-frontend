@@ -8,7 +8,10 @@ export default {
     conf: {
       adc: null,          // конфигурация ADC
       ntc: null,          // конфигурация NTC
-      dio: null,          // конфигурация DIO (inputs/outputs)
+      dio:null,
+      inputs: [],
+      outputs: [],
+      opencollectors:[],
       onewire: null,      // конфигурация OneWire
       rf433: null         // конфигурация RF433
     },

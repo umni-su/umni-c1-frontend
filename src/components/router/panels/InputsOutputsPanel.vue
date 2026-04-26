@@ -1,52 +1,65 @@
 <script>
+import RelaysPanel from "@/components/chunks/RelaysPanel.vue";
+import InputsPanel from "@/components/InputsPanel.vue";
+import OpenollectorsPanel from "@/components/chunks/OpencollectorsPanel.vue";
+
 export default {
   name: "InputsOutputsPanel",
-  data() {
+  components: {OpenollectorsPanel, InputsPanel, RelaysPanel},
+  data(){
     return {
-      mode: 'dio',
-      relays: [],
-      inputs: [],
-      handler: null
+      panels: []
     }
   },
-  computed: {
-    state() {
-      return this.$store.getters['getDioState']
+  computed:{
+    hasOutputs(){
+      return this.$store.getters['hasOutputs'];
     },
-    interval() {
-      return this.$store.getters['getRefreshInterval']
+    hasInputs(){
+      return this.$store.getters['hasInputs'];
+    },
+    hasOpenCollectors(){
+      return this.$store.getters['hasOpenCollectors'];
     }
   },
-  async created() {
-    await this.getState()
-    this.handler = setInterval(async () => {
-      await this.getState()
-    }, this.interval)
+  async created(){
+    if(this.hasOutputs){
+      this.panels.push('outputs')
+    }
+    if(this.hasInputs){
+      this.panels.push('inputs')
+    }
+    if(this.hasOpenCollectors){
+      this.panels.push('opencollectors')
+    }
+    await this.getData();
   },
-  unmounted() {
-    clearInterval(this.handler)
-  },
-  methods: {
-    async switchRelay(relay) {
-      const data = {
-        type: this.mode,
-        state: {
-          index: relay.index,
-          state: relay.state === 1 ? 0 : 1
-        }
+  methods:{
+    async getInputs(){
+      await this.$store.dispatch('getConf', 'inputs').catch(e=>{
+        console.log(e)
+      });
+    },
+    async getOutputs(){
+      await this.$store.dispatch('getConf', 'outputs').catch(e=>{
+        console.log(e)
+      });
+    },
+    async getOpenCollectors(){
+      await this.$store.dispatch('getConf', 'opencollectors').catch(e=>{
+        console.log(e)
+      });
+    },
+    async getData(){
+      if(this.hasOutputs){
+        await this.getOutputs();
       }
-      await this.$store.dispatch('setState', data)
-    },
-    async getState() {
-      await this.$store.dispatch('getDioState')
-      this.relays = this.state.do
-      this.inputs = this.state.di
-      this.relays.sort((a, b) => {
-        return a.order - b.order
-      })
-      this.inputs.sort((a, b) => {
-        return a.order - b.order
-      })
+      if(this.hasInputs){
+        await this.getInputs();
+      }
+      if(this.hasOpenCollectors){
+        await this.getOpenCollectors();
+      }
     }
   }
 }
@@ -57,79 +70,48 @@ export default {
     class="fill-height"
     value="dio"
   >
-    <VSheet height="100%">
-      <VContainer fluid>
-        <VCard
-          :title="$t('Relays')"
-          :subtitle="$t('Status management of relay outputs')"
+    <VSheet
+      height="100%"
+      class="pa-4"
+    >
+      <VExpansionPanels
+        v-model="panels"
+        multiple
+      >
+        <VExpansionPanel
+          v-if="hasOutputs"
+          value="outputs"
         >
-          <VCardText>
-            <VRow>
-              <VCol
-                v-for="relay in relays"
-                :key="relay.index"
-                md="4"
-                sm="6"
-              >
-                <VBtn
-                  :color="relay.state === 1 ? 'primary' : 'secondary'"
-                  variant="tonal"
-                  width="100%"
-                  @click="switchRelay(relay)"
-                >
-                  <template #prepend>
-                    <VIcon
-                      v-if="relay === 1"
-                      icon="mdi-toggle-switch"
-                    />
-                    <VIcon
-                      v-else
-                      icon="mdi-toggle-switch-off"
-                    />
-                  </template>
-                  {{ relay.label === null ? $t(`Relay #{index}`, {index: (relay.index + 1)}) : relay.label }}
-                </VBtn>
-              </VCol>
-            </VRow>
-          </VCardText>
-        </VCard>
-
-        <VCard
-          class="mt-8"
-          :title="$t('Inputs')"
-          :subtitle="$t('Status of discrete inputs')"
+          <VExpansionPanelTitle>
+            {{ $t('Outputs') }}
+          </VExpansionPanelTitle>
+          <VExpansionPanelText>
+            <RelaysPanel />
+          </VExpansionPanelText>
+        </VExpansionPanel>
+        <VExpansionPanel
+          v-if="hasInputs"
+          value="inputs"
         >
-          <VCardText>
-            <VRow>
-              <VCol
-                v-for="input in inputs"
-                :key="input.index"
-                md="4"
-                sm="6"
-              >
-                <VBtn
-                  readonly
-                  :color="input.state === 1 ? 'orange' : 'secondary'"
-                  variant="tonal"
-                  width="100%"
-                >
-                  <template #prepend>
-                    <VIcon
-                      v-if="input.state === 1"
-                      icon="mdi-bell-ring"
-                    />
-                    <VIcon
-                      v-else
-                      icon="mdi-bell-off"
-                    />
-                  </template>
-                  {{ input.label === null ? $t(`Input #{index}`, {index: input.index}) : input.label }}
-                </VBtn>
-              </VCol>
-            </VRow>
-          </VCardText>
-        </VCard>
-      </VContainer>
+          <VExpansionPanelTitle>
+            {{ $t('Inputs') }}
+          </VExpansionPanelTitle>
+          <VExpansionPanelText>
+            <InputsPanel />
+          </VExpansionPanelText>
+        </VExpansionPanel>
+        <VExpansionPanel
+          v-if="hasOpenCollectors"
+          value="opencollectors"
+        >
+          <VExpansionPanelTitle>
+            {{ $t('Open collector') }}
+          </VExpansionPanelTitle>
+          <VExpansionPanelText>
+            <OpenollectorsPanel />
+          </VExpansionPanelText>
+        </VExpansionPanel>
+      </VExpansionPanels>
     </VSheet>
   </VWindowItem>
 </template>

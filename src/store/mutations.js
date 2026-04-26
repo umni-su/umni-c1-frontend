@@ -39,6 +39,16 @@ export default {
     state.state.conf.rf433 = rf433
   },
 
+  setOutputs(state, outputs) {
+    state.state.conf.outputs = outputs
+  },
+  setInputs(state, inputs) {
+    state.state.conf.inputs = inputs
+  },
+  setOpenCollectors(state, oc) {
+    state.state.conf.opencollectors = oc
+  },
+
   // /api/state
   setOpenThermData(state, data) {
     state.state.sensorData.opentherm = data

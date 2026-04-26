@@ -17,6 +17,7 @@ export default {
 <template>
   <VCard
     v-if="debug"
+    width="100%"
     color="red"
     variant="tonal"
     class="mt-4"

@@ -141,6 +141,22 @@ export default {
     }
   },
 
+  async getConf({ commit, state }, section) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    const res = await axios.get(`${API}conf?section=${section}`).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success) {
+      state.state.conf[section] = res.data.data[section]
+      return res.data.data
+    } else {
+      throw new Error('No conf found for section ' + section)
+    }
+  },
+
   /** POST /api/settings **/
   async saveSetting({ commit }, { setting, values }) {
     commit('setLoading', true)
