@@ -103,6 +103,11 @@ export default {
   getDioConf(state) {
     return state.state.conf.dio
   },
+
+  getState:(state) => (key) => {
+    return state.state.sensorData[key] || null
+  },
+
   getRelayState: (state) => (index) => {
     const relay = state.state.conf.dio?.outputs?.find(r => r.config_index === index || r.port_index === index)
     return relay?.state !== undefined ? relay.state : relay?.default_state || 0

@@ -1,6 +1,6 @@
 {
   "name": "umni-frontend",
-  "version": "1.1.0-alpha",
+  "version": "1.2.0-beta",
   "private": true,
   "type": "module",
   "links": {

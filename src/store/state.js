@@ -16,7 +16,47 @@ export default {
       rf433: null         // конфигурация RF433
     },
     sensorData: {
-      opentherm: null     // данные с POST /api/state {capability: "opentherm"}
+      opentherm: null,     // данные с POST /api/state {capability: "opentherm"}
+      ai1: {
+        state: {
+          value: null
+        },
+        history: {
+          name: null,
+          timestamps: [],
+          values: []
+        }
+      },
+      ai2: {
+        state: {
+          value: null
+        },
+        history: {
+          name: null,
+          timestamps: [],
+          values: []
+        }
+      },
+      ntc1: {
+        state: {
+          value: null
+        },
+        history: {
+          name: null,
+          timestamps: [],
+          values: []
+        }
+      },
+      ntc2: {
+        state: {
+          value: null
+        },
+        history: {
+          name: null,
+          timestamps: [],
+          values: []
+        }
+      }
     }
   },
 

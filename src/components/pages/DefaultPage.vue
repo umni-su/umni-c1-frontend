@@ -48,7 +48,7 @@ export default {
 </script>
 
 <template>
-  <VLayout full-height>
+  <VSheet class="fill-height">
     <VAppBar
       elevation="0"
       color="primary"
@@ -138,7 +138,7 @@ export default {
         <AppLoader />
       </VSheet>
     </VMain>
-  </VLayout>
+  </VSheet>
 </template>
 
 <style scoped>

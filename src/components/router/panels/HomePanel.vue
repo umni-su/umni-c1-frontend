@@ -57,10 +57,10 @@ export default {
       color="transparent"
     >
       <VContainer
-        class="h-100"
+        class="fill-height"
         fluid
       >
-        <VRow class="fill-height">
+        <VRow>
           <VCol
             cols="12"
             md="6"

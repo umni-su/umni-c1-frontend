@@ -1,5 +1,6 @@
 import axios from 'axios'
 import dateToStringDateTime from "@/helpers/dateToStringDateTime.js"
+import * as packageJson from "../../package.json"
 
 window.axios = axios
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
@@ -18,8 +19,7 @@ export default {
     if (res?.data?.success) {
       commit('setSystemInfo', res.data.data)
       if (res.data.data.hostname) {
-        const version = res.data.data.hostname.split('-')[1]
-        commit('setVersion', version)
+        commit('setVersion', packageJson.version)
       }
     }
   },
@@ -117,6 +117,23 @@ export default {
 
     if (res?.data?.success) {
       commit('setRf433Conf', res.data.data)
+    }
+  },
+
+  async getState({ commit, state }, capability) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    const res = await axios.post(`${API}state`, {capability}).finally(() => {
+      commit('setLoading', false)
+    })
+
+    if (res?.data?.success && res.data?.data) {
+      commit('setState', {
+        key: capability,
+        value: res.data.data?.state?.value,
+        history: res.data?.data?.history,
+      })
     }
   },
 

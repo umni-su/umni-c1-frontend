@@ -44,29 +44,17 @@ export default {
           v-for="net in netif"
           :key="net.name"
         >
-          <VTable>
-            <thead>
-              <tr>
-                <th colspan="3">
-                  <div class="text-h6 text-center">
-                    {{ net.name }}
-                  </div>
-                </th>
-              </tr>
-              <tr>
-                <th>{{ $t('Mac address') }}</th>
-                <th>{{ $t('IP address') }}</th>
-                <th>{{ $t('Network mask') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{ mac(net.mac) }}</td>
-                <td>{{ net.ip }}</td>
-                <td>{{ net.mask }}</td>
-              </tr>
-            </tbody>
-          </VTable>
+          <VList density="compact">
+            <VListSubheader>{{ net.name.toUpperCase() }}</VListSubheader>
+            <VListItem>
+              <VListItemSubtitle>{{ $t('Mac address') }}</VListItemSubtitle>
+              <VListItemTitle>{{ net.mac }}</VListItemTitle>
+              <VListItemSubtitle>{{ $t('IP address') }}</VListItemSubtitle>
+              <VListItemTitle>{{ net.ip }}</VListItemTitle>
+              <VListItemSubtitle>{{ $t('Network mask') }}</VListItemSubtitle>
+              <VListItemTitle>{{ net.mask }}</VListItemTitle>
+            </VListItem>
+          </VList>
         </VCarouselItem>
       </VCarousel>
     </VCardText>
@@ -74,19 +62,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.info {
-  .info-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
-
-  .value {
-    span {
-      display: block;
-    }
-  }
-}
 
 </style>

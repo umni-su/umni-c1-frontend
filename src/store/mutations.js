@@ -54,6 +54,10 @@ export default {
     state.state.sensorData.opentherm = data
   },
 
+  setState(state, {key, value, history}) {
+    state.state.sensorData[key] = {value, history}
+  },
+
   // Charts
   pushAdcData(state, { datetime, adc1, adc2 }) {
     state.charts.time.push(datetime)
