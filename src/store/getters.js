@@ -16,12 +16,60 @@ export default {
     return state.version
   },
 
+  isSidebarRail(state) {
+    return state.sidebarRail
+  },
+  isSidebarOpen(state) {
+    return state.sidebarOpen
+  },
+  isScanMode(state) {
+    return state.scanMode
+  },
+
+  getDevices(state) {
+    return [...state.devices].sort((a, b) => {
+      // Активное устройство всегда первое
+      if (a.active && !b.active) return -1;
+      if (!a.active && b.active) return 1;
+
+      // Затем сортируем по имени
+      return a.name.localeCompare(b.name);
+    });
+  },
+
+  getFilteredDevices: (state) => (searchText) => {
+    let devices = [...state.devices];
+
+    if (searchText) {
+      const query = searchText.toLowerCase();
+      devices = devices.filter(device =>
+        device.name.toLowerCase().includes(query) ||
+        device.ip.toLowerCase().includes(query) ||
+        device.hostname.toLowerCase().includes(query)
+      );
+    }
+
+    return devices.sort((a, b) => {
+      if (a.active && !b.active) return -1;
+      if (!a.active && b.active) return 1;
+      return a.name.localeCompare(b.name);
+    });
+  },
+
+  getActiveDevice(state) {
+    return state.activeDevice
+  },
+
+  isAddDevice(state) {
+    return state.addDevice
+  },
+
   // System Info (/api/systeminfo)
   getSystemInfo(state) {
     return state.state.info
   },
   getHostname(state) {
-    return state.state.info?.hostname || null
+    return state.activeDevice?.hostname || null
   },
   getCapabilities(state) {
     return state.state.info?.capabilities || []
@@ -38,6 +86,10 @@ export default {
   },
   getOpenCollectors(state) {
     return state.state.conf.opencollectors || []
+  },
+
+  isDeviceError(state){
+    return state.deviceRequestError
   },
 
   // Проверка capabilities
@@ -127,7 +179,7 @@ export default {
 
   // Данные сенсоров (/api/state)
   getOpenThermData(state) {
-    return state.state.sensorData.opentherm
+    return state.state.sensorData.opentherm?.state
   },
   getBoilerTemperature(state) {
     return state.state.sensorData.opentherm?.boiler_temperature || 0

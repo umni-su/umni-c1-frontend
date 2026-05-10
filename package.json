@@ -1,5 +1,5 @@
 {
-  "name": "umni-frontend",
+  "name": "umni-uni",
   "version": "1.2.0-beta",
   "private": true,
   "type": "module",
@@ -13,6 +13,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix",
+    "tauri": "tauri",
     "update:check": "ncu",
     "update:interactive": "ncu -i",
     "update:patch": "ncu -u --target patch && npm install --legacy-peer-deps",
@@ -24,8 +25,14 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@tauri-apps/api": "^2.11.0",
+    "@tauri-apps/cli": "^2.11.0",
+    "@tauri-apps/plugin-http": "^2.5.8",
+    "@tauri-apps/plugin-opener": "^2.5.4",
+    "@tauri-apps/plugin-store": "^2.4.3",
     "axios": "^1.15.2",
     "echarts": "^6.0.0",
+    "moment": "^2.30.1",
     "vue": "^3.5.33",
     "vue-i18n": "^11.4.0",
     "vue-router": "^5.0.6",
@@ -34,6 +41,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@vitejs/plugin-vue": "^6.0.6",
+    "esbuild": "^0.28.0",
     "eslint": "^10.2.1",
     "eslint-plugin-vue": "^10.9.0",
     "sass-embedded": "^1.99.0",

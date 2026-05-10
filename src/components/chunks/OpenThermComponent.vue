@@ -170,7 +170,7 @@ export default {
       return this.supportedFeatures.dhw_present || false
     },
 
-    isModulating() {
+    isModulation() {
       return this.supportedFeatures.modulating || false
     }
 

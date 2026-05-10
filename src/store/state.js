@@ -2,6 +2,13 @@ export default {
   theme: localStorage.getItem('theme') !== null ? localStorage.getItem('theme') : 'light',
   loading: false,
   debug: false,
+  devices:[],
+  sidebarOpen:localStorage.getItem('sidebarOpen') !== null ? localStorage.getItem('sidebarOpen') : false,
+  sidebarRail:localStorage.getItem('sidebarRail') !== null ? localStorage.getItem('sidebarRail') : true,
+  scanMode: false,
+  activeDevice: null,
+  addDevice: null,
+  deviceRequestError: false,
 
   state: {
     info: null,           // /api/systeminfo
@@ -75,5 +82,5 @@ export default {
   },
 
   version: null,
-  refreshInterval: 5000
+  refreshInterval: 10000
 }

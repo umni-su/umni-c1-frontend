@@ -8,7 +8,29 @@ export default {
   computed:{
     openCollectors(){
       return this.$store.getters['getOpenCollectors']
+    },
+    lastMessage(){
+      return this.$store.getters['lastMessage'];
     }
+  },
+  watch:{
+    lastMessage:{
+      deep: true,
+      handler(v){
+        if(v.data.capability === 'oc'){
+          try {
+            const index = parseInt(v.data.identifier.replace('oc',''));
+            const value = typeof v.data.value === "boolean" ? v.data.value : v.data.value === 1;
+            this.$store.commit('updateOcState', {
+              index: index - 1, // case OC1 OC2, but index 0,1
+              state: value
+            });
+          } catch(err){
+            console.log(err)
+          }
+        }
+      }
+    },
   }
 }
 </script>

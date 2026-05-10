@@ -2,6 +2,11 @@
 
 export default {
   name: 'DateTimeWidget',
+  data(){
+    return {
+      showAllCaps: false
+    }
+  },
   computed: {
     sysinfo() {
       return this.$store.getters['getSystemInfo']
@@ -20,6 +25,9 @@ export default {
     },
     month() {
       return (this.date.getMonth() + 1).toString().padStart(2, '0')
+    },
+    capMaxLen(){
+      return this.capabilities.length > 4 ? 4 : this.capabilities.length
     }
   }
 }
@@ -33,14 +41,30 @@ export default {
     variant="tonal"
   >
     <VCardText class="datetime">
-      <div class="text-display-medium font-weight-black">
+      <div class="text-headline-medium font-weight-black">
         {{ hostname }}
       </div>
       <div class="text-body-small mt-1">
         {{ $t('Allowed capabilities') }}
       </div>
       <div class="text-center mt-4">
-        <VChip size="small" class="mr-1 mb-1" v-for="cap in capabilities" :key="cap" :text="cap" rounded="pill"></VChip>
+        <VChip
+          v-for="cap in showAllCaps ? capabilities : capabilities.slice(0, capMaxLen)"
+          :key="cap"
+          size="small"
+          class="mr-1 mb-1"
+          :text="cap"
+          rounded="pill"
+        />
+        <VChip
+          v-if="capabilities.length >capMaxLen"
+          size="small"
+          :prepend-icon="showAllCaps ? 'mdi-chevron-left' : 'mdi-chevron-right'"
+          class="mr-1 mb-1"
+          :text="showAllCaps? $t('Less') : $t('More')"
+          rounded="pill"
+          @click="showAllCaps = !showAllCaps"
+        />
       </div>
     </VCardText>
   </VCard>

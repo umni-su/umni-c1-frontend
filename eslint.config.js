@@ -47,7 +47,8 @@ export default [
         FileReader: 'readonly',
         FormData: 'readonly',
         URL: 'readonly',
-        URLSearchParams: 'readonly'
+        URLSearchParams: 'readonly',
+        EventSource: 'readonly'
       }
     }
   },

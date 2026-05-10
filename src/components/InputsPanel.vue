@@ -9,6 +9,25 @@ export default {
     inputs(){
       return this.$store.getters['getInputs']
     },
+    lastMessage(){
+      return this.$store.getters['lastMessage'];
+    }
+  },
+  watch: {
+    lastMessage:{
+      deep: true,
+      handler(v){
+        if(v.data.capability === 'inputs'){
+          try {
+            const index = parseInt(v.data.identifier.replace('inp',''));
+            const value = typeof v.data.value === "boolean" ? v.data.value : v.data.value === 1;
+            this.$store.commit('updateInputState', {index, state: value});
+          } catch(err){
+            console.log(err)
+          }
+        }
+      }
+    },
   }
 }
 </script>

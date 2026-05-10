@@ -3,10 +3,12 @@ import {markRaw} from "vue";
 import * as echarts from 'echarts';
 import RealTimeGraphNotification from "@/components/chunks/RealTimeGraphNotification.vue";
 import NtcConf from "@/components/chunks/NtcConf.vue";
+import AdcConf from "@/components/chunks/AdcConf.vue";
 
 export default {
   name: "AnalogSensors",
   components: {
+    AdcConf,
     NtcConf,
     RealTimeGraphNotification
   },
@@ -89,11 +91,11 @@ export default {
   >
     <VSheet
       v-if="loaded"
-      class="home-panel fill-height"
-      color="transparent"
+      elevation="2"
+      class="fill-height"
     >
       <NtcConf />
-      {{ aiConf }}
+      <AdcConf />
     </VSheet>
     <VEmptyState v-else>
       <VProgressCircular

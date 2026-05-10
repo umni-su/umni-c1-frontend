@@ -53,11 +53,11 @@ export default {
   >
     <VSheet
       v-if="sysinfo"
-      class="home-panel fill-height"
+      class="fill-height"
       color="transparent"
     >
       <VContainer
-        class="fill-height"
+        class="fill-height pa-0"
         fluid
       >
         <VRow>

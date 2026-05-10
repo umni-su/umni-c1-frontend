@@ -8,7 +8,12 @@ export default {
   components: {OpenollectorsPanel, InputsPanel, RelaysPanel},
   data(){
     return {
-      panels: []
+      panels: [],
+      event: {
+        capability: null,
+        identifier: null,
+        value: null,
+      }
     }
   },
   computed:{
@@ -20,7 +25,11 @@ export default {
     },
     hasOpenCollectors(){
       return this.$store.getters['hasOpenCollectors'];
-    }
+    },
+
+  },
+  watch:{
+
   },
   async created(){
     if(this.hasOutputs){
@@ -71,8 +80,8 @@ export default {
     value="dio"
   >
     <VSheet
-      height="100%"
-      class="pa-4"
+      width="100%"
+      color="transparent"
     >
       <VExpansionPanels
         v-model="panels"

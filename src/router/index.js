@@ -15,6 +15,7 @@ import SettingsClimate from "@/components/router/settings/SettingsClimate.vue";
 import RfPanel from "@/components/router/panels/RfPanel.vue";
 import SettingsRf from "@/components/router/settings/SettingsRf.vue";
 import AnalogSensorsPanel from "@/components/router/panels/AnalogSensorsPanel.vue";
+import DevicesPage from "@/components/router/DevicesPage.vue";
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -55,9 +56,9 @@ const router = createRouter({
       ]
     },
     {
-      path: '/updates',
-      component: UpdatesPage,
-      name: 'updates'
+      path: '/devices',
+      component: DevicesPage,
+      name: 'devices'
     },
     {
       path: '/settings',

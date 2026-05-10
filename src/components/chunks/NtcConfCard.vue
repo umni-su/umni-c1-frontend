@@ -41,7 +41,7 @@ export default {
 <template>
   <VCard
     hover
-    variant="tonal"
+    variant="text"
     :title="ntc.label"
     :subtitle="`#ntc${index}`"
   >

@@ -1,5 +1,6 @@
 <script>
 import packageJson from '../../../../package.json'
+import {openUrl} from "@tauri-apps/plugin-opener";
 
 export default {
   name: 'UsefulWidget',
@@ -9,6 +10,11 @@ export default {
     },
     mqtt() {
       return this.sysinfo.mqtt
+    }
+  },
+  methods: {
+    async openExternalLink(url) {
+      await openUrl(url);
     }
   }
 }
@@ -20,7 +26,7 @@ export default {
     height="100%"
   >
     <VCardText class="d-flex flex-column align-center justify-center fill-height">
-      <VSheet>
+      <VSheet class="text-center">
         <VChip
           color="primary"
           variant="outlined"
@@ -28,8 +34,8 @@ export default {
           rounded="pill"
           prepend-icon="mdi-web"
           :text="$t('Website')"
-          target="_blank"
-          :href="links.site"
+          href="#"
+          @click.prevent="openExternalLink(links.site)"
         />
         <VChip
           color="success"
@@ -39,8 +45,8 @@ export default {
           rounded="pill"
           prepend-icon="mdi-bookmark"
           :text="$t('Documentation')"
-          target="_blank"
-          :href="links.docs"
+          href="#"
+          @click.prevent="openExternalLink(links.docs)"
         />
         <VChip
           color="orange"
@@ -49,8 +55,8 @@ export default {
           rounded="pill"
           prepend-icon="mdi-book"
           :text="$t('API')"
-          target="_blank"
-          :href="links.api"
+          href="#"
+          @click.prevent="openExternalLink(links.api)"
         />
       </VSheet>
     </VCardText>

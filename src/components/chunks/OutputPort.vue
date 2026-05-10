@@ -20,8 +20,11 @@ export default {
 
   },
   watch: {
-    state(){
-      //
+    port: {
+      deep: true,
+      handler(v) {
+        this.state = v.state
+      }
     }
   },
   created() {
@@ -45,7 +48,10 @@ export default {
     md="3"
     sm="6"
   >
-    <VCard variant="tonal">
+    <VCard
+      variant="tonal"
+      min-height="130"
+    >
       <template #title>
         {{ port.label }}
       </template>
@@ -64,7 +70,7 @@ export default {
       <VCardText class=" pa-0 d-flex align-center justify-center">
         <VSwitch
           v-model="state"
-          color="success"
+          color="primary"
           inline
           inset
           direction="vertical"

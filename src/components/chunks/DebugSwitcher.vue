@@ -1,6 +1,12 @@
 <script>
 export default {
   name: "DebugSwitcher",
+  props: {
+    asListItem:{
+      type:Boolean,
+      default:false
+    }
+  },
   computed: {
     debug() {
       return this.$store.getters['isDebug']
@@ -15,7 +21,16 @@ export default {
 </script>
 
 <template>
+  <VListItem
+    v-if="asListItem"
+    :title="$t('Debug mode')"
+    :prepend-icon="debug ? 'mdi-bug' :'mdi-bug-outline'"
+    :variant="debug ? 'tonal' : 'plain'"
+    :base-color="debug ? 'red' : 'default'"
+    @click="setDebug"
+  />
   <VBtn
+    v-else
     v-tooltip="$t('Debug mode')"
     :icon="debug ? 'mdi-bug' :'mdi-bug-outline'"
     :variant="debug ? 'tonal' : 'plain'"

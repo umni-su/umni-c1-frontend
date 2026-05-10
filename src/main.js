@@ -6,6 +6,15 @@ import {createVuetify} from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
+import {createApp} from 'vue'
+import App from './App.vue'
+import router from './router'
+import store from "@/store/store.js";
+
+// main.js
+import moment from "moment";
+import 'moment/dist/locale/ru';
+
 const light = {
   dark: false,
   colors: {
@@ -40,10 +49,18 @@ const vuetify = createVuetify({
       hideDetails: true,
       density: 'compact',
     },
+    VList:{
+      VListItem: {
+        rounded: 0
+      }
+    },
     VSelect: {
       variant: 'outlined',
       hideDetails: true,
       density: 'compact',
+    },
+    VSwitch:{
+      hideDetails: true
     },
     VAutocomplete: {
       hideDetails: true,
@@ -77,10 +94,7 @@ const vuetify = createVuetify({
   },
 
 })
-import {createApp} from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from "@/store/store.js";
+
 
 const i18n = setupI18n({
   locale: 'ru',
@@ -91,7 +105,7 @@ const i18n = setupI18n({
 
 loadLocaleMessages(i18n, i18n.global.locale).then(() => {
   const app = createApp(App)
-
+  app.config.globalProperties.$moment = moment
   app.use(router)
   app.use(i18n)
   app.use(store)

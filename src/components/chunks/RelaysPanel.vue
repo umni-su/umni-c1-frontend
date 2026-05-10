@@ -9,13 +9,35 @@ export default {
   computed:{
     outputs(){
       return this.$store.getters['getOutputs']
+    },
+    lastMessage(){
+      return this.$store.getters['lastMessage'];
     }
+  },
+  watch:{
+    lastMessage:{
+      deep: true,
+      handler(v){
+        if(v.data.capability === 'outputs'){
+          try {
+            const index = parseInt(v.data.identifier.replace('out',''));
+            const value = typeof v.data.value === "boolean" ? v.data.value : v.data.value === 1;
+            this.$store.commit('updateRelayState', {index, state: value});
+          } catch(err){
+            console.log(err)
+          }
+        }
+      }
+    },
   }
 }
 </script>
 
 <template>
-  <VContainer fluid>
+  <VContainer
+    v-if="outputs"
+    fluid
+  >
     <VRow>
       <OutputPort
         v-for="port in outputs"

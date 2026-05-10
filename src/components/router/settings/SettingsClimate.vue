@@ -216,7 +216,7 @@ export default {
               />
             </ParameterItem>
             <ParameterItem
-              :title="$t('Target heating temperature')"
+              :title="$t('Heating temperature')"
               :subtitle="$t('The set heating temperature of the heating circuit')"
             >
               <VTextField

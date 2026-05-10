@@ -30,12 +30,14 @@ export default {
 
 <template>
   <VSheet
-    rounded="0"
     height="100%"
+    class="mx-auto"
+    max-width="1200"
     color="transparent"
   >
     <VTabs
       v-model="tab"
+      color="default"
       grow
       center-active
       align-tabs="center"
@@ -88,11 +90,13 @@ export default {
     </VTabs>
     <VTabsWindow
       v-model="tab"
-      class="full-card-window-height"
+      class="full-card-window-height pt-4"
     >
       <VSheet
-        max-width="1200"
-        class="mx-auto pa-4 fill-height"
+
+        width="100%"
+        color="transparent"
+        class="pa-2 mx-auto fill-height"
       >
         <RouterView />
       </VSheet>

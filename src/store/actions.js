@@ -1,10 +1,29 @@
-import axios from 'axios'
 import dateToStringDateTime from "@/helpers/dateToStringDateTime.js"
-import * as packageJson from "../../package.json"
+import {invoke} from "@tauri-apps/api/core";
 
-window.axios = axios
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+// Базовые настройки (axios больше не нужен)
 const API = '/api/'
+
+async function secureApiRequest(method, url, body = null, commit = null) {
+  if(commit){
+    commit('deviceRequestErrorOff')
+  }
+  try {
+    // Rust-команда сама вернет готовый объект, если ответ — JSON
+    // Если произойдет сетевая ошибка или IP запрещен — выкинет exception
+    return await invoke('secure_request', {
+      payload: {url, method, body}
+    })
+  } catch (error) {
+    // error здесь — это то, что мы написали в Err(...) в Rust
+    const customError = new Error(error)
+    console.error(`Secure Request Error [${method}]:`, error)
+    if(commit){
+      commit('deviceRequestErrorOn')
+    }
+    throw customError
+  }
+}
 
 export default {
   /** GET /api/systeminfo **/
@@ -12,15 +31,32 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.get(`${API}systeminfo`).finally(() => {
+    try {
+      const data = await secureApiRequest('GET',`http://${state.activeDevice.ip}${API}systeminfo`, null, commit)
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      commit('setSystemInfo', res.data.data)
-      if (res.data.data.hostname) {
-        commit('setVersion', packageJson.version)
+      if (data.success) {
+        commit('setSystemInfo', data.data)
       }
+      return data
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('getSystemInfo error:', error)
+      throw error
+    }
+  },
+
+  async checkDevice({ commit, state }, ip) {
+    if (state.loading) return false
+    commit('setLoading', true)
+
+    try {
+      const data = await secureApiRequest('GET',`http://${ip}${API}systeminfo`, null, commit)
+      commit('setLoading', false)
+      return data.data
+    } catch (error) {
+      commit('setLoading', false)
+      throw error
     }
   },
 
@@ -29,21 +65,30 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.get(`${API}conf`, {
-      params: { section: 'adc' }
-    }).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'GET',
+        `http://${state.activeDevice.ip}${API}conf`,
+        { section: 'adc' },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      commit('setAdcConf', res.data.data)
+      if (data?.success) {
+        commit('setAdcConf', data.data)
 
-      // Получаем значения каналов для графиков
-      const datetime = dateToStringDateTime()
-      const channels = res.data.data.channels || []
-      const adc1 = channels.find(c => c.id === 0)?.value
-      const adc2 = channels.find(c => c.id === 1)?.value
-      commit('pushAdcData', { datetime, adc1, adc2 })
+        // Получаем значения каналов для графиков
+        const datetime = dateToStringDateTime()
+        const channels = data.data.channels || []
+        const adc1 = channels.find(c => c.id === 0)?.value
+        const adc2 = channels.find(c => c.id === 1)?.value
+        commit('pushAdcData', { datetime, adc1, adc2 })
+      }
+      return data
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('getAdcConf error:', error)
+      throw error
     }
   },
 
@@ -52,19 +97,28 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.get(`${API}conf`, {
-      params: { section: 'ntc' }
-    }).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'GET',
+        `http://${state.activeDevice.ip}${API}conf`,
+        { section: 'ntc' },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      commit('setNtcConf', res.data.data)
+      if (data?.success) {
+        commit('setNtcConf', data.data)
 
-      const channels = res.data.data.channels || []
-      const ntc1 = channels.find(c => c.id === 0)?.value?.toFixed(2)
-      const ntc2 = channels.find(c => c.id === 1)?.value?.toFixed(2)
-      commit('pushNtcData', { ntc1, ntc2 })
+        const channels = data.data.channels || []
+        const ntc1 = channels.find(c => c.id === 0)?.value?.toFixed(2)
+        const ntc2 = channels.find(c => c.id === 1)?.value?.toFixed(2)
+        commit('pushNtcData', { ntc1, ntc2 })
+      }
+      return data
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('getNtcConf error:', error)
+      throw error
     }
   },
 
@@ -73,14 +127,23 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.get(`${API}conf`, {
-      params: { section: 'dio' }
-    }).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'GET',
+        `http://${state.activeDevice.ip}${API}conf`,
+        { section: 'dio' },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      commit('setDioConf', res.data.data)
+      if (data?.success) {
+        commit('setDioConf', data.data)
+      }
+      return data
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('getDioConf error:', error)
+      throw error
     }
   },
 
@@ -89,18 +152,27 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.get(`${API}conf`, {
-      params: { section: 'onewire' }
-    }).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'GET',
+        `http://${state.activeDevice.ip}${API}conf`,
+        { section: 'onewire' },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      const datetime = dateToStringDateTime()
-      const sensors = res.data.data.sensors || []
+      if (data?.success) {
+        const datetime = dateToStringDateTime()
+        const sensors = data.data.sensors || []
 
-      commit('updateOneWireChart', { datetime, sensors })
-      commit('setOneWireConf', res.data.data)
+        commit('updateOneWireChart', { datetime, sensors })
+        commit('setOneWireConf', data.data)
+      }
+      return data
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('getOneWireConf error:', error)
+      throw error
     }
   },
 
@@ -109,14 +181,23 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.get(`${API}conf`, {
-      params: { section: 'rf433' }
-    }).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'GET',
+        `http://${state.activeDevice.ip}${API}conf`,
+        { section: 'rf433' },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      commit('setRf433Conf', res.data.data)
+      if (data?.success) {
+        commit('setRf433Conf', data.data)
+      }
+      return data
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('getRf433Conf error:', error)
+      throw error
     }
   },
 
@@ -124,16 +205,27 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.post(`${API}state`, {capability}).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'POST',
+        `http://${state.activeDevice.ip}${API}state`,
+        { capability },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success && res.data?.data) {
-      commit('setState', {
-        key: capability,
-        value: res.data.data?.state?.value,
-        history: res.data?.data?.history,
-      })
+      if (data?.success && data?.data) {
+        commit('setState', {
+          key: capability,
+          value: data.data?.state?.value,
+          history: data?.data?.history,
+        })
+      }
+      return data
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('getState error:', error)
+      throw error
     }
   },
 
@@ -142,19 +234,28 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.post(`${API}state`, {
-      capability: 'opentherm'
-    }).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'POST',
+        `http://${state.activeDevice.ip}${API}state`,
+        { capability: 'opentherm' },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      const datetime = dateToStringDateTime()
-      const modulation = res.data.data.modulation
-      const temperature = res.data.data.boiler_temperature
+      if (data?.success) {
+        const datetime = dateToStringDateTime()
+        const modulation = data.data.modulation
+        const temperature = data.data.boiler_temperature
 
-      commit('pushOpenThermData', { datetime, modulation, temperature })
-      commit('setOpenThermData', res.data.data)
+        commit('pushOpenThermData', { datetime, modulation, temperature })
+        commit('setOpenThermData', data.data)
+      }
+      return data
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('getOpenThermState error:', error)
+      throw error
     }
   },
 
@@ -162,49 +263,80 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.get(`${API}conf?section=${section}`).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'GET',
+        `http://${state.activeDevice.ip}${API}conf`,
+        { section },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      state.state.conf[section] = res.data.data[section]
-      return res.data.data
-    } else {
-      throw new Error('No conf found for section ' + section)
+      if (data?.success) {
+        // Используем Vue.set или прямой доступ к объекту
+        // В зависимости от вашего store
+        if (!state.state.conf) {
+          state.state.conf = {}
+        }
+        state.state.conf[section] = data.data[section]
+        return data.data
+      } else {
+        throw new Error('No conf found for section ' + section)
+      }
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('getConf error:', error)
+      throw error
     }
   },
 
   /** POST /api/settings **/
-  async saveSetting({ commit }, { setting, values }) {
+  async saveSetting({ commit, state }, { setting, values }) {
     commit('setLoading', true)
 
-    const res = await axios.post(`${API}settings`, { setting, values }).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'POST',
+        `http://${state.activeDevice.ip}${API}settings`,
+        { setting, values },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      return res.data
+      if (data?.success) {
+        return data
+      }
+      return null
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('saveSetting error:', error)
+      return null
     }
-    return null
   },
 
   /** POST /api/switch **/
-  async switchRelay({ commit }, { mode, index, level }) {
+  async switchRelay({ commit, state }, { mode, index, level }) {
     commit('setLoading', true)
 
-    const res = await axios.post(`${API}switch`, {
-      mode,      // 'outputs' или 'opencollectors'
-      index,     // 1-8
-      level      // 0 или 1
-    }).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'POST',
+        `http://${state.activeDevice.ip}${API}switch`,
+        { mode, index, level },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      commit('updateRelayState', { index, state: level })
-      return res.data
+      if (data?.success) {
+        commit('updateRelayState', { index, state: level })
+        return data
+      }
+      return null
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('switchRelay error:', error)
+      return null
     }
-    return null
   },
 
   /** POST /api/beep **/
@@ -212,18 +344,24 @@ export default {
     if (state.loading) return false
     commit('setLoading', true)
 
-    const res = await axios.post(`${API}beep`, {
-      count,    // количество сигналов (>=1)
-      on_ms,    // длительность сигнала в мс (0-1000)
-      off_ms    // пауза между сигналами в мс (0-1000)
-    }).finally(() => {
+    try {
+      const data = await secureApiRequest(
+        'POST',
+        `http://${state.activeDevice.ip}${API}beep`,
+        { count, on_ms, off_ms },
+        commit
+      )
       commit('setLoading', false)
-    })
 
-    if (res?.data?.success) {
-      return res.data
+      if (data?.success) {
+        return data
+      }
+      return null
+    } catch (error) {
+      commit('setLoading', false)
+      console.error('beep error:', error)
+      return null
     }
-    return null
   },
 
   /** ЗАГРУЗКА ВСЕХ ДАННЫХ **/

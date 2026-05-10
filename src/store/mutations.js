@@ -1,3 +1,4 @@
+import {storage as deviceStorage} from "@/store/devices/device_store.js";
 export default {
   // UI mutations
   setTheme(state, theme) {
@@ -15,6 +16,56 @@ export default {
   },
   setVersion(state, version) {
     state.version = version
+  },
+  setAddDevice(state, addDevice) {
+    state.addDevice = addDevice
+  },
+  setDeviceRequestError(state, err){
+    state.deviceRequestError = err
+  },
+  deviceRequestErrorOn(state){
+    state.deviceRequestError = true
+  },
+  deviceRequestErrorOff(state){
+    state.deviceRequestError = false
+  },
+
+  setDevices(state, devices){
+    state.devices = devices
+  },
+
+  setSidebarRail(state, sidebarRail) {
+    state.sidebarRail = sidebarRail
+  },
+  setSidebarOpen(state, sidebarOpen) {
+    state.sidebarOpen = sidebarOpen
+  },
+  setScanMode(state, scanMode) {
+    state.scanMode = scanMode
+  },
+
+  async saveDevice(state, device){
+    const index = state.devices.findIndex(d => d.hostname === device.hostname)
+    if(index === -1){
+      state.devices.push(device)
+      await deviceStorage.saveDevice(device, false)
+    } else {
+      state.devices[index] = {...state.devices[index], ...device}
+      await deviceStorage.updateDevice(device.hostname, device)
+    }
+
+  },
+
+  removeDevice(state, device){
+    state.devices = state.devices.filter(d => d.hostname !== device.hostname)
+  },
+
+  async setActiveDevice(state, activeDevice) {
+    if(activeDevice !== null) {
+      await deviceStorage.saveDevice(activeDevice, true)
+    }
+    state.activeDevice = activeDevice
+    state.devices = await deviceStorage.loadSavedDevices()
   },
 
   // /api/systeminfo
@@ -134,12 +185,35 @@ export default {
   },
 
   updateRelayState(state, { index, state: relayState }) {
-    if (state.state.conf.dio?.outputs) {
-      const relayIndex = state.state.conf.dio.outputs.findIndex(
-        r => r.config_index === index || r.port_index === index
+    if (state.state.conf?.outputs) {
+      const relayIndex = state.state.conf?.outputs.findIndex(
+        r => r.index === index
       )
-      if (relayIndex > -1 && state.state.conf.dio.outputs[relayIndex]) {
-        state.state.conf.dio.outputs[relayIndex].state = relayState
+
+      if (relayIndex > -1 && state.state.conf?.outputs[relayIndex]) {
+        state.state.conf.outputs[relayIndex].state = relayState
+      }
+    }
+  },
+  updateInputState(state, { index, state: relayState }) {
+    if (state.state.conf?.inputs) {
+      const inputIndex = state.state.conf?.inputs.findIndex(
+        r => r.index === index
+      )
+
+      if (inputIndex > -1 && state.state.conf?.inputs[inputIndex]) {
+        state.state.conf.inputs[inputIndex].state = relayState
+      }
+    }
+  },
+  updateOcState(state, { index, state: ocState }) {
+    if (state.state.conf?.inputs) {
+      const ocIndex = state.state.conf?.opencollectors.findIndex(
+        r => r.index === index
+      )
+
+      if (ocIndex > -1 && state.state.conf?.opencollectors[ocIndex]) {
+        state.state.conf.opencollectors[ocIndex].state = ocState
       }
     }
   },
